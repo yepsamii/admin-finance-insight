@@ -31,7 +31,8 @@ export const AuthProvider = ({ children }) => {
     // Listen for auth changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (_event, session) => {
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log("Auth state changed:", event, session?.user?.email);
       setUser(session?.user ?? null);
       if (session?.user) {
         await fetchProfile(session.user.id);
@@ -61,43 +62,13 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const signUp = async (email, password, fullName) => {
-    try {
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            full_name: fullName,
-          },
-        },
-      });
-      if (error) throw error;
-      return { data, error: null };
-    } catch (error) {
-      return { data: null, error };
-    }
-  };
-
-  const signIn = async (email, password) => {
-    try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-      if (error) throw error;
-      return { data, error: null };
-    } catch (error) {
-      return { data: null, error };
-    }
-  };
-
   const signInWithGoogle = async () => {
     try {
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: `${window.location.origin}/about`,
+          redirectTo: `${window.location.origin}`,
+          skipBrowserRedirect: false,
         },
       });
       if (error) throw error;
@@ -109,12 +80,21 @@ export const AuthProvider = ({ children }) => {
 
   const signOut = async () => {
     try {
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
+      console.log("Signing out...");
+      const { data, error } = await supabase.auth.signOut();
+      console.log(data);
+      if (error) {
+        console.error("Sign out error:", error);
+        throw error;
+      }
+      console.log("Sign out successful");
+      // Force immediate state update
       setUser(null);
       setProfile(null);
+      return { error: null };
     } catch (error) {
       console.error("Error signing out:", error.message);
+      return { error };
     }
   };
 
@@ -139,8 +119,6 @@ export const AuthProvider = ({ children }) => {
     user,
     profile,
     loading,
-    signUp,
-    signIn,
     signInWithGoogle,
     signOut,
     updateProfile,

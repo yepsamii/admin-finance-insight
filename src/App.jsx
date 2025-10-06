@@ -1,4 +1,9 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import Layout from "./components/Layout";
 import Home from "./pages/Home";
@@ -29,16 +34,6 @@ const App = () => {
                   <ProtectedRoute>
                     <About />
                   </ProtectedRoute>
-                }
-              />
-              {/* Catch all - redirect to home */}
-              <Route
-                path="*"
-                element={
-                  <Navigate
-                    to="/"
-                    replace
-                  />
                 }
               />
             </Routes>
