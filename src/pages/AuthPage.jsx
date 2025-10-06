@@ -1,11 +1,17 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 
-export default function AuthPage({ supabase }) {
+export default function AuthPage() {
+  const navigate = useNavigate();
+  const { signUp, signIn, signInWithGoogle } = useAuth();
+
   const [isSignUp, setIsSignUp] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
     confirmPassword: "",
+    fullName: "",
   });
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: "", text: "" });
@@ -19,9 +25,30 @@ export default function AuthPage({ supabase }) {
   };
 
   const handleEmailAuth = async () => {
-    if (isSignUp && formData.password !== formData.confirmPassword) {
-      setMessage({ type: "error", text: "Passwords do not match!" });
+    // Validation
+    if (!formData.email || !formData.password) {
+      setMessage({ type: "error", text: "Please fill in all fields!" });
       return;
+    }
+
+    if (isSignUp) {
+      if (!formData.fullName) {
+        setMessage({ type: "error", text: "Please enter your full name!" });
+        return;
+      }
+
+      if (formData.password !== formData.confirmPassword) {
+        setMessage({ type: "error", text: "Passwords do not match!" });
+        return;
+      }
+
+      if (formData.password.length < 6) {
+        setMessage({
+          type: "error",
+          text: "Password must be at least 6 characters!",
+        });
+        return;
+      }
     }
 
     setLoading(true);
@@ -30,33 +57,44 @@ export default function AuthPage({ supabase }) {
     try {
       if (isSignUp) {
         // Sign Up
-        const { data, error } = await supabase.auth.signUp({
-          email: formData.email,
-          password: formData.password,
+        const { data, error } = await signUp(
+          formData.email,
+          formData.password,
+          formData.fullName
+        );
+        console.log("sign up ------>>", data);
+        if (error) throw error;
+
+        setMessage({
+          type: "success",
+          text: "Sign up successful! Redirecting to dashboard...",
         });
+
+        // Redirect to dashboard after 1 second
+        setTimeout(() => navigate("/dashboard"), 1000);
+      } else {
+        // Sign In
+        const { data, error } = await signIn(formData.email, formData.password);
+        console.log("sign in ------>>", data);
 
         if (error) throw error;
 
         setMessage({
           type: "success",
-          text: "Sign up successful! Please check your email for verification.",
-        });
-        console.log("User signed up:", data);
-      } else {
-        // Sign In
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email: formData.email,
-          password: formData.password,
+          text: "Sign in successful! Redirecting...",
         });
 
-        if (error) throw error;
-
-        setMessage({ type: "success", text: "Sign in successful!" });
-        console.log("User signed in:", data);
+        // Redirect to dashboard after 1 second
+        setTimeout(() => navigate("/dashboard"), 1000);
       }
 
       // Clear form
-      setFormData({ email: "", password: "", confirmPassword: "" });
+      setFormData({
+        email: "",
+        password: "",
+        confirmPassword: "",
+        fullName: "",
+      });
     } catch (error) {
       setMessage({ type: "error", text: error.message });
       console.error("Auth error:", error);
@@ -70,20 +108,11 @@ export default function AuthPage({ supabase }) {
     setMessage({ type: "", text: "" });
 
     try {
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
-          queryParams: {
-            access_type: "offline",
-            prompt: "consent",
-          },
-        },
-      });
+      const { error } = await signInWithGoogle();
 
       if (error) throw error;
 
-      console.log("Google sign in initiated:", data);
+      // Google OAuth will redirect automatically
     } catch (error) {
       setMessage({ type: "error", text: error.message });
       console.error("Google auth error:", error);
@@ -151,6 +180,27 @@ export default function AuthPage({ supabase }) {
         </div>
 
         <div className="space-y-4">
+          {isSignUp && (
+            <div>
+              <label
+                htmlFor="fullName"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Full Name
+              </label>
+              <input
+                type="text"
+                id="fullName"
+                name="fullName"
+                value={formData.fullName}
+                onChange={handleInputChange}
+                disabled={loading}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition disabled:opacity-50 disabled:cursor-not-allowed"
+                placeholder="John Doe"
+              />
+            </div>
+          )}
+
           <div>
             <label
               htmlFor="email"
@@ -242,6 +292,12 @@ export default function AuthPage({ supabase }) {
             onClick={() => {
               setIsSignUp(!isSignUp);
               setMessage({ type: "", text: "" });
+              setFormData({
+                email: "",
+                password: "",
+                confirmPassword: "",
+                fullName: "",
+              });
             }}
             disabled={loading}
             className="ml-2 text-indigo-600 hover:text-indigo-700 font-medium disabled:opacity-50"
