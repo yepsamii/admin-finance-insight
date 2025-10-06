@@ -7,37 +7,88 @@ export default function AuthPage({ supabase }) {
     password: "",
     confirmPassword: "",
   });
-
-  async function signUpNewUser() {
-    const { data, error } = await supabase.auth.signUp({
-      email: "valid.email@supabase.io",
-      password: "example-password",
-      options: {
-        emailRedirectTo: "https://example.com/welcome",
-      },
-    });
-  }
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState({ type: "", text: "" });
 
   const handleInputChange = (e) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
     });
+    setMessage({ type: "", text: "" });
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleEmailAuth = async () => {
     if (isSignUp && formData.password !== formData.confirmPassword) {
-      alert("Passwords do not match!");
+      setMessage({ type: "error", text: "Passwords do not match!" });
       return;
     }
-    console.log("Submitted:", formData);
-    alert(`${isSignUp ? "Sign Up" : "Sign In"} successful!`);
+
+    setLoading(true);
+    setMessage({ type: "", text: "" });
+
+    try {
+      if (isSignUp) {
+        // Sign Up
+        const { data, error } = await supabase.auth.signUp({
+          email: formData.email,
+          password: formData.password,
+        });
+
+        if (error) throw error;
+
+        setMessage({
+          type: "success",
+          text: "Sign up successful! Please check your email for verification.",
+        });
+        console.log("User signed up:", data);
+      } else {
+        // Sign In
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email: formData.email,
+          password: formData.password,
+        });
+
+        if (error) throw error;
+
+        setMessage({ type: "success", text: "Sign in successful!" });
+        console.log("User signed in:", data);
+      }
+
+      // Clear form
+      setFormData({ email: "", password: "", confirmPassword: "" });
+    } catch (error) {
+      setMessage({ type: "error", text: error.message });
+      console.error("Auth error:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleGoogleSignIn = () => {
-    console.log("Google sign in clicked");
-    alert("Google Sign In clicked!");
+  const handleGoogleSignIn = async () => {
+    setLoading(true);
+    setMessage({ type: "", text: "" });
+
+    try {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+          queryParams: {
+            access_type: "offline",
+            prompt: "consent",
+          },
+        },
+      });
+
+      if (error) throw error;
+
+      console.log("Google sign in initiated:", data);
+    } catch (error) {
+      setMessage({ type: "error", text: error.message });
+      console.error("Google auth error:", error);
+      setLoading(false);
+    }
   };
 
   return (
@@ -52,9 +103,22 @@ export default function AuthPage({ supabase }) {
           </p>
         </div>
 
+        {message.text && (
+          <div
+            className={`mb-4 p-3 rounded-lg text-sm ${
+              message.type === "error"
+                ? "bg-red-100 text-red-700 border border-red-200"
+                : "bg-green-100 text-green-700 border border-green-200"
+            }`}
+          >
+            {message.text}
+          </div>
+        )}
+
         <button
           onClick={handleGoogleSignIn}
-          className="w-full flex items-center justify-center gap-3 bg-white border-2 border-gray-300 rounded-lg px-4 py-3 text-gray-700 font-medium hover:bg-gray-50 transition-colors mb-6"
+          disabled={loading}
+          className="w-full flex items-center justify-center gap-3 bg-white border-2 border-gray-300 rounded-lg px-4 py-3 text-gray-700 font-medium hover:bg-gray-50 transition-colors mb-6 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <svg
             className="w-5 h-5"
@@ -77,7 +141,7 @@ export default function AuthPage({ supabase }) {
               d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
             />
           </svg>
-          Continue with Google
+          {loading ? "Loading..." : "Continue with Google"}
         </button>
 
         <div className="flex items-center gap-4 mb-6">
@@ -100,7 +164,8 @@ export default function AuthPage({ supabase }) {
               name="email"
               value={formData.email}
               onChange={handleInputChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition"
+              disabled={loading}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition disabled:opacity-50 disabled:cursor-not-allowed"
               placeholder="you@example.com"
             />
           </div>
@@ -118,7 +183,8 @@ export default function AuthPage({ supabase }) {
               name="password"
               value={formData.password}
               onChange={handleInputChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition"
+              disabled={loading}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition disabled:opacity-50 disabled:cursor-not-allowed"
               placeholder="••••••••"
             />
           </div>
@@ -137,7 +203,8 @@ export default function AuthPage({ supabase }) {
                 name="confirmPassword"
                 value={formData.confirmPassword}
                 onChange={handleInputChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition"
+                disabled={loading}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition disabled:opacity-50 disabled:cursor-not-allowed"
                 placeholder="••••••••"
               />
             </div>
@@ -159,10 +226,11 @@ export default function AuthPage({ supabase }) {
           )}
 
           <button
-            onClick={handleSubmit}
-            className="w-full bg-indigo-600 text-white font-medium py-3 rounded-lg hover:bg-indigo-700 transition-colors"
+            onClick={handleEmailAuth}
+            disabled={loading}
+            className="w-full bg-indigo-600 text-white font-medium py-3 rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isSignUp ? "Sign Up" : "Sign In"}
+            {loading ? "Loading..." : isSignUp ? "Sign Up" : "Sign In"}
           </button>
         </div>
 
@@ -171,8 +239,12 @@ export default function AuthPage({ supabase }) {
             {isSignUp ? "Already have an account?" : "Don't have an account?"}
           </span>
           <button
-            onClick={() => setIsSignUp(!isSignUp)}
-            className="ml-2 text-indigo-600 hover:text-indigo-700 font-medium"
+            onClick={() => {
+              setIsSignUp(!isSignUp);
+              setMessage({ type: "", text: "" });
+            }}
+            disabled={loading}
+            className="ml-2 text-indigo-600 hover:text-indigo-700 font-medium disabled:opacity-50"
           >
             {isSignUp ? "Sign In" : "Sign Up"}
           </button>

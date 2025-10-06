@@ -5,47 +5,13 @@ import Layout from "./components/Layout";
 import Home from "./pages/Home";
 import About from "./pages/About";
 import Users from "./pages/Users";
-import { createClient } from "@supabase/supabase-js";
-import { useEffect, useState } from "react";
-import { Auth } from "@supabase/auth-ui-react";
-import { ThemeSupa } from "@supabase/auth-ui-shared";
 import AuthPage from "./pages/AuthPage";
-
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 60 * 1000,
-      refetchOnWindowFocus: false,
-    },
-  },
-});
-
-const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY
-);
+import { AuthProvider } from "./contexts/AuthContext";
 
 const App = () => {
-  const [session, setSession] = useState(null);
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-    });
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
-    return () => subscription.unsubscribe();
-  }, []);
-  if (!session) {
-    return <AuthPage />;
-  }
-
   return (
-    <HelmetProvider>
-      <QueryClientProvider client={queryClient}>
+    <AuthProvider>
+      <HelmetProvider>
         <Router>
           <Layout>
             <Routes>
@@ -54,18 +20,36 @@ const App = () => {
                 element={<Home />}
               />
               <Route
+                path="/login"
+                element={<AuthPage />}
+              />
+              <Route
                 path="/about"
                 element={<About />}
               />
               <Route
-                path="/users"
-                element={<Users />}
+                path="/dashboard"
+                element={
+                  <ProtectedRoute>
+                    <Users />
+                  </ProtectedRoute>
+                }
+              />
+              {/* Catch all - redirect to home */}
+              <Route
+                path="*"
+                element={
+                  <Navigate
+                    to="/"
+                    replace
+                  />
+                }
               />
             </Routes>
           </Layout>
         </Router>
-      </QueryClientProvider>
-    </HelmetProvider>
+      </HelmetProvider>
+    </AuthProvider>
   );
 };
 
