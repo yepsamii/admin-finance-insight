@@ -114,12 +114,14 @@ CREATE POLICY "Categories are deletable by authenticated users" ON categories
 ### Posts Policies
 
 ```sql
--- Posts: Published posts are viewable by everyone, all posts by author
-CREATE POLICY "Published posts are viewable by everyone" ON posts
+-- Posts: Published posts viewable by everyone, authenticated users can view all posts
+-- Policy 1: Anyone (including anonymous users) can view published posts
+CREATE POLICY "Anyone can view published posts" ON posts
   FOR SELECT USING (published = true);
 
-CREATE POLICY "Users can view their own posts" ON posts
-  FOR SELECT USING (auth.uid() = author_id);
+-- Policy 2: Authenticated users can view all posts (published and drafts)
+CREATE POLICY "Authenticated users can view all posts" ON posts
+  FOR SELECT USING (auth.role() = 'authenticated');
 
 CREATE POLICY "Users can insert their own posts" ON posts
   FOR INSERT WITH CHECK (auth.uid() = author_id);
