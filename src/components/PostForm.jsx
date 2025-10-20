@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { categoriesApi, tagsApi } from "../services/blogApi";
+import { categoriesApi, tagsApi, storageApi } from "../services/blogApi";
 
 const PostForm = ({ post = null, onSubmit, onCancel, isLoading = false }) => {
   const [formData, setFormData] = useState({
@@ -16,6 +16,9 @@ const PostForm = ({ post = null, onSubmit, onCancel, isLoading = false }) => {
   const [tags, setTags] = useState([]);
   const [loading, setLoading] = useState(true);
   const [errors, setErrors] = useState({});
+  const [imageInputMode, setImageInputMode] = useState("url"); // 'url' or 'upload'
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   useEffect(() => {
     const loadData = async () => {
@@ -73,6 +76,90 @@ const PostForm = ({ post = null, onSubmit, onCancel, isLoading = false }) => {
         ? prev.tags.filter((id) => id !== tagId)
         : [...prev.tags, tagId],
     }));
+  };
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    const validTypes = [
+      "image/jpeg",
+      "image/jpg",
+      "image/png",
+      "image/gif",
+      "image/webp",
+    ];
+    if (!validTypes.includes(file.type)) {
+      setErrors((prev) => ({
+        ...prev,
+        header_image_url:
+          "Please upload a valid image file (JPEG, PNG, GIF, or WebP)",
+      }));
+      return;
+    }
+
+    // Validate file size (5MB max)
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    if (file.size > maxSize) {
+      setErrors((prev) => ({
+        ...prev,
+        header_image_url: "Image size must be less than 5MB",
+      }));
+      return;
+    }
+
+    try {
+      setUploadingImage(true);
+      setUploadProgress(0);
+      setErrors((prev) => ({ ...prev, header_image_url: "" }));
+
+      // Simulate progress (Supabase doesn't provide upload progress natively)
+      const progressInterval = setInterval(() => {
+        setUploadProgress((prev) => {
+          if (prev >= 90) {
+            clearInterval(progressInterval);
+            return 90;
+          }
+          return prev + 10;
+        });
+      }, 200);
+
+      const imageUrl = await storageApi.uploadImage(file);
+
+      clearInterval(progressInterval);
+      setUploadProgress(100);
+
+      setFormData((prev) => ({
+        ...prev,
+        header_image_url: imageUrl,
+      }));
+
+      // Reset progress after a short delay
+      setTimeout(() => {
+        setUploadProgress(0);
+      }, 1000);
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      setErrors((prev) => ({
+        ...prev,
+        header_image_url: error.message || "Failed to upload image",
+      }));
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setFormData((prev) => ({
+      ...prev,
+      header_image_url: "",
+    }));
+    // Reset file input if in upload mode
+    const fileInput = document.getElementById("image_file");
+    if (fileInput) {
+      fileInput.value = "";
+    }
   };
 
   const validateForm = () => {
@@ -170,42 +257,151 @@ const PostForm = ({ post = null, onSubmit, onCancel, isLoading = false }) => {
         </p>
       </div>
 
-      {/* Header Image URL */}
+      {/* Header Image */}
       <div>
-        <label
-          htmlFor="header_image_url"
-          className="block text-sm font-semibold text-gray-900 mb-2"
-        >
-          Cover Image URL
-        </label>
-        <div className="relative">
-          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+        <div className="flex items-center justify-between mb-3">
+          <label className="block text-sm font-semibold text-gray-900">
+            Cover Image
+          </label>
+          <div className="flex items-center space-x-2 bg-gray-100 rounded-lg p-1">
+            <button
+              type="button"
+              onClick={() => setImageInputMode("url")}
+              className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all duration-200 ${
+                imageInputMode === "url"
+                  ? "bg-white text-blue-600 shadow-sm"
+                  : "text-gray-600 hover:text-gray-900"
+              }`}
+            >
+              URL
+            </button>
+            <button
+              type="button"
+              onClick={() => setImageInputMode("upload")}
+              className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all duration-200 ${
+                imageInputMode === "upload"
+                  ? "bg-white text-blue-600 shadow-sm"
+                  : "text-gray-600 hover:text-gray-900"
+              }`}
+            >
+              Upload
+            </button>
+          </div>
+        </div>
+
+        {imageInputMode === "url" ? (
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+              <svg
+                className="w-5 h-5 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
+                />
+              </svg>
+            </div>
+            <input
+              type="url"
+              id="header_image_url"
+              name="header_image_url"
+              value={formData.header_image_url}
+              onChange={handleChange}
+              className="input-field pl-12"
+              placeholder="https://images.example.com/cover.jpg"
+            />
+          </div>
+        ) : (
+          <div>
+            <div className="flex items-center justify-center w-full">
+              <label
+                htmlFor="image_file"
+                className={`flex flex-col items-center justify-center w-full h-40 border-2 border-dashed rounded-xl cursor-pointer transition-all duration-200 ${
+                  uploadingImage
+                    ? "border-blue-400 bg-blue-50"
+                    : "border-gray-300 bg-gray-50 hover:bg-gray-100 hover:border-gray-400"
+                }`}
+              >
+                <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                  {uploadingImage ? (
+                    <>
+                      <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-3"></div>
+                      <p className="text-sm text-gray-600 font-medium">
+                        Uploading... {uploadProgress}%
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <svg
+                        className="w-10 h-10 mb-3 text-gray-400"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                        />
+                      </svg>
+                      <p className="mb-2 text-sm text-gray-700 font-semibold">
+                        <span className="text-blue-600">Click to upload</span>{" "}
+                        or drag and drop
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        PNG, JPG, GIF or WebP (MAX. 5MB)
+                      </p>
+                    </>
+                  )}
+                </div>
+                <input
+                  id="image_file"
+                  type="file"
+                  className="hidden"
+                  accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+                  onChange={handleImageUpload}
+                  disabled={uploadingImage}
+                />
+              </label>
+            </div>
+            {uploadProgress > 0 && uploadProgress < 100 && (
+              <div className="mt-3">
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div
+                    className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                    style={{ width: `${uploadProgress}%` }}
+                  ></div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {errors.header_image_url && (
+          <div className="mt-2 flex items-center text-sm text-red-600">
             <svg
-              className="w-5 h-5 text-gray-400"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+              className="w-4 h-4 mr-1"
+              fill="currentColor"
+              viewBox="0 0 20 20"
             >
               <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                fillRule="evenodd"
+                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                clipRule="evenodd"
               />
             </svg>
+            {errors.header_image_url}
           </div>
-          <input
-            type="url"
-            id="header_image_url"
-            name="header_image_url"
-            value={formData.header_image_url}
-            onChange={handleChange}
-            className="input-field pl-12"
-            placeholder="https://images.example.com/cover.jpg"
-          />
-        </div>
+        )}
+
         {formData.header_image_url && (
-          <div className="mt-4 rounded-xl overflow-hidden border-2 border-gray-200">
+          <div className="mt-4 relative rounded-xl overflow-hidden border-2 border-gray-200 group">
             <img
               src={formData.header_image_url}
               alt="Preview"
@@ -215,6 +411,25 @@ const PostForm = ({ post = null, onSubmit, onCancel, isLoading = false }) => {
                   "https://via.placeholder.com/800x450?text=Image+Not+Found";
               }}
             />
+            <button
+              type="button"
+              onClick={handleRemoveImage}
+              className="absolute top-3 right-3 p-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all duration-200 opacity-0 group-hover:opacity-100 shadow-lg"
+            >
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                />
+              </svg>
+            </button>
           </div>
         )}
       </div>

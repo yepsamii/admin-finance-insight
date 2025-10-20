@@ -10,6 +10,62 @@ const generateSlug = (title) => {
     .trim("-");
 };
 
+// STORAGE API
+export const storageApi = {
+  // Upload image to Supabase Storage
+  async uploadImage(file) {
+    const { user } = (await supabase.auth.getUser()).data;
+    if (!user) throw new Error("User not authenticated");
+
+    // Generate unique filename
+    const fileExt = file.name.split(".").pop();
+    const fileName = `${user.id}/${Date.now()}-${Math.random()
+      .toString(36)
+      .substring(7)}.${fileExt}`;
+
+    // Upload to Supabase Storage
+    const { data, error } = await supabase.storage
+      .from("post-images")
+      .upload(fileName, file, {
+        cacheControl: "3600",
+        upsert: false,
+      });
+
+    if (error) throw error;
+
+    // Get public URL
+    const {
+      data: { publicUrl },
+    } = supabase.storage.from("post-images").getPublicUrl(data.path);
+
+    return publicUrl;
+  },
+
+  // Delete image from Supabase Storage
+  async deleteImage(imageUrl) {
+    if (!imageUrl) return;
+
+    try {
+      // Extract path from URL
+      const url = new URL(imageUrl);
+      const pathMatch = url.pathname.match(/\/post-images\/(.+)/);
+
+      if (pathMatch && pathMatch[1]) {
+        const filePath = pathMatch[1];
+
+        const { error } = await supabase.storage
+          .from("post-images")
+          .remove([filePath]);
+
+        if (error) throw error;
+      }
+    } catch (error) {
+      console.error("Error deleting image:", error);
+      // Don't throw error as this is not critical
+    }
+  },
+};
+
 // POSTS API
 export const postsApi = {
   // Get all published posts for homepage
