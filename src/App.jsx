@@ -12,6 +12,7 @@ import Dashboard from "./pages/Dashboard";
 import AuthPage from "./pages/AuthPage";
 import PostPage from "./pages/PostPage";
 import Settings from "./pages/Settings";
+import Resources from "./pages/Resources";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
@@ -40,6 +41,10 @@ const App = () => {
                 <Route
                   path="/post/:slug"
                   element={<PostPage />}
+                />
+                <Route
+                  path="/resources"
+                  element={<Resources />}
                 />
                 <Route
                   path="/login"
