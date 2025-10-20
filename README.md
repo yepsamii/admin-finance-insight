@@ -1,30 +1,62 @@
-# React Boilerplate
+# Personal Blog Platform
 
-A modern React boilerplate with all the essential tools and libraries pre-configured for building scalable web applications.
+A modern, full-featured personal blog platform with admin panel built with React, Supabase, and Tailwind CSS. Create, manage, and publish your blog posts with ease!
+
+## ✨ Features
+
+- 📝 **Full Blog Management** - Create, edit, delete, and publish blog posts
+- 🏷️ **Categories & Tags** - Organize posts with global categories and individual tags
+- 🖼️ **Header Images** - Add beautiful header images to posts
+- 🔐 **Authentication** - Secure Google OAuth authentication via Supabase
+- 📱 **Responsive Design** - Works perfectly on mobile, tablet, and desktop
+- 🎨 **Modern UI** - Clean, professional design with Tailwind CSS
+- ⚡ **Fast & Optimized** - Built with Vite and TanStack Query for optimal performance
+- 🔒 **Secure** - Row Level Security policies ensure data protection
 
 ## 🚀 Technologies
 
-- **React** - JavaScript library for building user interfaces
-- **Vite** - Next generation frontend tooling for fast development
-- **React Router DOM** - Declarative routing for React applications
-- **Tailwind CSS** - Utility-first CSS framework for rapid UI development
-- **Axios** - Promise-based HTTP client with interceptors
-- **TanStack Query** - Powerful data synchronization for React
-- **React Helmet Async** - Document head management for React
+- **React 18.3** - Modern UI library
+- **Vite 7.1** - Lightning-fast build tool
+- **Supabase** - Backend as a Service (Auth + Database)
+- **TanStack Query** - Powerful data synchronization
+- **React Router DOM** - Client-side routing
+- **Tailwind CSS** - Utility-first styling
+- **React Helmet Async** - SEO optimization
 
-## 📦 Installation
+## 🚀 Quick Start
+
+### Prerequisites
+
+- Node.js 16+
+- A Supabase account ([Sign up free](https://supabase.com))
+
+### Installation
+
+1. **Clone and install dependencies**
 
 ```bash
-# Clone the repository
-git clone <your-repo-url>
-cd react-boilerplate
-
-# Install dependencies
 npm install
+```
 
-# Start development server
+2. **Set up Supabase database**
+
+   - Follow instructions in `SUPABASE_SETUP.md`
+   - Run all SQL commands in your Supabase SQL Editor
+
+3. **Configure environment**
+
+```bash
+cp env.example .env
+# Edit .env with your Supabase credentials
+```
+
+4. **Start the app**
+
+```bash
 npm run dev
 ```
+
+**📖 For detailed setup, see [QUICK_START.md](QUICK_START.md)**
 
 ## 🛠️ Available Scripts
 
@@ -46,81 +78,145 @@ npm run lint
 
 ```
 src/
-├── pages/              # Page components
-│   ├── Home.jsx       # Landing page
-│   ├── About.jsx      # About page with React Helmet example
-│   └── Users.jsx      # Users list with API integration
-├── services/          # API and external services
-│   └── api.js        # Axios instance with interceptors
-├── App.jsx           # Main app component with providers
-├── main.jsx          # Application entry point
-└── index.css         # Tailwind CSS directives
+├── components/         # Reusable UI components
+│   ├── Layout.jsx     # Main layout with navigation
+│   ├── ProtectedRoute.jsx # Route protection
+│   ├── PostCard.jsx   # Post display component
+│   ├── PostForm.jsx   # Post creation/editing form
+│   └── PostDetail.jsx # Individual post view
+├── contexts/          # React Context providers
+│   └── AuthContext.jsx # Authentication state
+├── lib/               # External service configs
+│   └── supabase.js   # Supabase client
+├── pages/             # Page components
+│   ├── Home.jsx      # Blog homepage
+│   ├── Dashboard.jsx # Admin dashboard
+│   ├── Settings.jsx  # Category/Tag management
+│   ├── PostPage.jsx  # Individual post page
+│   └── AuthPage.jsx  # Login page
+├── services/          # API services
+│   └── blogApi.js    # Blog CRUD operations
+├── App.jsx           # Main app with routing
+└── main.jsx          # Application entry point
 ```
 
 ## 🔧 Configuration
 
 ### Axios
+
 The Axios instance is pre-configured with:
+
 - Base URL pointing to JSONPlaceholder API (for demo)
 - Request/Response interceptors for auth tokens
 - Error handling for 401 responses
 
 ### TanStack Query
+
 QueryClient is configured with:
+
 - 60-second stale time
 - Disabled refetch on window focus
 - Ready for custom query options
 
 ### Tailwind CSS
+
 - Full Tailwind CSS setup with PostCSS
 - Configured for all JSX/TSX files
 - Ready for customization in `tailwind.config.js`
 
-## 🎯 Features
+## 🎯 Key Pages
 
-- ⚡ Lightning fast HMR with Vite
-- 🔀 Client-side routing with React Router
-- 🎨 Utility-first styling with Tailwind CSS
-- 📡 API integration with Axios interceptors
-- 🔄 Efficient data fetching with TanStack Query
-- 🔍 SEO optimization with React Helmet
-- 📱 Responsive design out of the box
-- 🏗️ Production-ready build configuration
+### Public Pages
 
-## 📝 Example Pages
+- **`/`** - Homepage displaying all published posts
+- **`/post/:slug`** - Individual post with full content
+- **`/login`** - Google OAuth authentication
 
-### Home Page (`/`)
-- Overview of included technologies
-- Navigation to other pages
-- Responsive grid layout
+### Protected Pages (Require Login)
 
-### About Page (`/about`)
-- Demonstrates React Helmet for SEO
-- Features list with checkmarks
-- Getting started instructions
+- **`/dashboard`** - Admin panel to manage all posts
+- **`/settings`** - Manage categories and tags
 
-### Users Page (`/users`)
-- TanStack Query integration
-- Axios API calls to JSONPlaceholder
-- Loading and error states
-- Responsive user cards grid
+## 📝 Usage
 
-## 🚦 Getting Started
+### Creating a Post
 
-1. **Modify API Base URL**: Update the base URL in `src/services/api.js` to point to your backend API
+1. Login with Google
+2. Go to **Dashboard**
+3. Click **New Post**
+4. Fill in title, description, content
+5. Add header image URL (optional)
+6. Select category and tags
+7. Check "Publish" to make it live
+8. Click **Create Post**
 
-2. **Add Your Pages**: Create new page components in `src/pages/` and add routes in `App.jsx`
+### Managing Categories & Tags
 
-3. **Customize Styles**: Modify Tailwind configuration in `tailwind.config.js` for your brand colors and design system
+1. Go to **Settings**
+2. Use **Categories** tab to manage categories
+3. Use **Tags** tab to manage tags
+4. Create, edit, or delete as needed
 
-4. **Set Up Authentication**: The axios interceptor is ready for JWT tokens - just implement your auth logic
+## 📚 Documentation
 
-5. **Add Environment Variables**: Create a `.env` file for your API endpoints and configuration
+- **[QUICK_START.md](QUICK_START.md)** - Get started in 5 minutes
+- **[SUPABASE_SETUP.md](SUPABASE_SETUP.md)** - Complete database setup guide
+- **[BLOG_SETUP_GUIDE.md](BLOG_SETUP_GUIDE.md)** - Detailed setup instructions
+- **[IMPLEMENTATION_SUMMARY.md](IMPLEMENTATION_SUMMARY.md)** - Full feature list and technical details
+- **[DOCUMENTATION.md](DOCUMENTATION.md)** - Original project documentation
 
-## 🤝 Contributing
+## 🎨 Customization
 
-Feel free to submit issues and pull requests.
+### Change Blog Name
+
+Edit `src/components/Layout.jsx`:
+
+```jsx
+<span className="text-xl font-bold text-gray-900">Your Blog Name</span>
+```
+
+### Modify Colors
+
+Edit `tailwind.config.js` to customize your color scheme.
+
+### Add Features
+
+The codebase is well-structured and documented, making it easy to add:
+
+- Comments system
+- Search functionality
+- Image upload
+- RSS feed
+- Social sharing
+- Analytics
+
+## 🛠️ Tech Stack Details
+
+### Frontend
+
+- React 18 with Hooks
+- Vite for blazing-fast development
+- TanStack Query for server state management
+- React Router for navigation
+- Tailwind CSS for styling
+
+### Backend
+
+- Supabase PostgreSQL database
+- Supabase Authentication (Google OAuth)
+- Row Level Security policies
+- Automatic timestamps and triggers
+
+### Development
+
+- ESLint for code quality
+- Hot Module Replacement
+- Environment variable support
 
 ## 📄 License
 
 MIT
+
+---
+
+**Built with ❤️ using React and Supabase**

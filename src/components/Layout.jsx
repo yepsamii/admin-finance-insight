@@ -25,12 +25,12 @@ const Layout = ({ children }) => {
 
   const authLinks = user
     ? [
-        { path: "/", label: "Home" },
+        { path: "/", label: "Blog" },
         { path: "/dashboard", label: "Dashboard" },
+        { path: "/settings", label: "Settings" },
       ]
     : [
-        { path: "/", label: "Home" },
-        { path: "/about", label: "About" },
+        { path: "/", label: "Blog" },
         { path: "/login", label: "Login" },
       ];
 
@@ -47,9 +47,7 @@ const Layout = ({ children }) => {
                 <div className="w-8 h-8 bg-gray-900 text-white flex items-center justify-center font-bold">
                   R
                 </div>
-                <span className="text-xl font-bold text-gray-900">
-                  React Boilerplate
-                </span>
+                <span className="text-xl font-bold text-gray-900">My Blog</span>
               </Link>
             </div>
 
