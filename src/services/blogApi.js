@@ -135,7 +135,7 @@ export const postsApi = {
       .from("posts")
       .select("id")
       .eq("slug", slug)
-      .single();
+      .maybeSingle();
 
     if (existingPost) {
       throw new Error("A post with this title already exists");
@@ -204,7 +204,7 @@ export const postsApi = {
         .select("id")
         .eq("slug", newSlug)
         .neq("id", id)
-        .single();
+        .maybeSingle();
 
       if (existingPost) {
         throw new Error("A post with this title already exists");

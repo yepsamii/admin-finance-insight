@@ -20,6 +20,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     // Check active session
     supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log("Initial session check:", session?.user?.email || "No user");
       setUser(session?.user ?? null);
       if (session?.user) {
         fetchProfile(session.user.id);
@@ -32,11 +33,17 @@ export const AuthProvider = ({ children }) => {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log("Auth state changed:", event, session?.user?.email);
+      console.log(
+        "Auth state changed:",
+        event,
+        session?.user?.email || "No user"
+      );
       setUser(session?.user ?? null);
       if (session?.user) {
+        console.log("Fetching profile for user:", session.user.id);
         await fetchProfile(session.user.id);
       } else {
+        console.log("No user, clearing profile");
         setProfile(null);
         setLoading(false);
       }
@@ -47,6 +54,7 @@ export const AuthProvider = ({ children }) => {
 
   const fetchProfile = async (userId) => {
     try {
+      console.log("Fetching profile for userId:", userId);
       const { data, error } = await supabase
         .from("users")
         .select("*")
@@ -54,10 +62,13 @@ export const AuthProvider = ({ children }) => {
         .single();
 
       if (error) throw error;
+      console.log("Profile fetched successfully:", data);
       setProfile(data);
     } catch (error) {
       console.error("Error fetching profile:", error.message);
+      setProfile(null);
     } finally {
+      console.log("Setting loading to false");
       setLoading(false);
     }
   };
@@ -81,19 +92,41 @@ export const AuthProvider = ({ children }) => {
   const signOut = async () => {
     try {
       console.log("Signing out...");
-      const { data, error } = await supabase.auth.signOut();
-      console.log(data);
-      if (error) {
-        console.error("Sign out error:", error);
-        throw error;
-      }
-      console.log("Sign out successful");
-      // Force immediate state update
+
+      // Create a promise that times out after 2 seconds
+      const signOutWithTimeout = Promise.race([
+        supabase.auth.signOut(),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error("Signout timeout")), 2000)
+        ),
+      ]);
+
+      // Clear state immediately for responsive UI
       setUser(null);
       setProfile(null);
+      console.log("Local state cleared");
+
+      // Try to sign out from Supabase (with timeout)
+      try {
+        const { error } = await signOutWithTimeout;
+        if (error) {
+          console.warn("Supabase signOut error (ignored):", error);
+        } else {
+          console.log("Supabase sign out successful");
+        }
+      } catch (timeoutError) {
+        console.warn(
+          "Supabase signOut timed out (ignored):",
+          timeoutError.message
+        );
+      }
+
       return { error: null };
     } catch (error) {
-      console.error("Error signing out:", error.message);
+      console.error("Error signing out:", error);
+      // Ensure state is cleared even on error
+      setUser(null);
+      setProfile(null);
       return { error };
     }
   };

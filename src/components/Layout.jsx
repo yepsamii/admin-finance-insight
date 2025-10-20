@@ -10,16 +10,18 @@ const Layout = ({ children }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleLogout = async () => {
+    setIsLoggingOut(true);
+    console.log("Starting logout...");
+
     try {
-      setIsLoggingOut(true);
       await signOut();
-      navigate("/");
-      localStorage.clear();
+      console.log("Logout successful, navigating home...");
     } catch (err) {
       console.error("Logout error:", err);
-      alert("Failed to logout. Please try again.");
     } finally {
+      // Always reset the button and navigate, even on error
       setIsLoggingOut(false);
+      navigate("/", { replace: true });
     }
   };
 
