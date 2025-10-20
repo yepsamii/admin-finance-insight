@@ -15,72 +15,92 @@ import Settings from "./pages/Settings";
 import Resources from "./pages/Resources";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+import ErrorBoundary from "./components/ErrorBoundary";
 
-// Create a client
+// Create a client with proper error handling
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: 60 * 1000, // 1 minute
       refetchOnWindowFocus: false,
+      retry: 1, // Only retry once instead of 3 times
+      retryDelay: 1000, // Wait 1 second before retrying
+      networkMode: "online", // Only fetch when online
+      // Add timeout to prevent hanging queries
+      gcTime: 5 * 60 * 1000, // 5 minutes (renamed from cacheTime)
+      // Add error handling
+      onError: (error) => {
+        console.error("Query error:", error);
+      },
+    },
+    mutations: {
+      retry: 0, // Don't retry mutations
+      networkMode: "online",
+      // Add error handling
+      onError: (error) => {
+        console.error("Mutation error:", error);
+      },
     },
   },
 });
 
 const App = () => {
   return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <HelmetProvider>
-          <Router>
-            <Layout>
-              <Routes>
-                <Route
-                  path="/"
-                  element={<Home />}
-                />
-                <Route
-                  path="/post/:slug"
-                  element={<PostPage />}
-                />
-                <Route
-                  path="/resources"
-                  element={<Resources />}
-                />
-                <Route
-                  path="/login"
-                  element={<AuthPage />}
-                />
-                <Route
-                  path="/dashboard"
-                  element={
-                    <ProtectedRoute>
-                      <Dashboard />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/settings"
-                  element={
-                    <ProtectedRoute>
-                      <Settings />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="*"
-                  element={
-                    <Navigate
-                      to="/"
-                      replace
-                    />
-                  }
-                />
-              </Routes>
-            </Layout>
-          </Router>
-        </HelmetProvider>
-      </AuthProvider>
-    </QueryClientProvider>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <HelmetProvider>
+            <Router>
+              <Layout>
+                <Routes>
+                  <Route
+                    path="/"
+                    element={<Home />}
+                  />
+                  <Route
+                    path="/post/:slug"
+                    element={<PostPage />}
+                  />
+                  <Route
+                    path="/resources"
+                    element={<Resources />}
+                  />
+                  <Route
+                    path="/login"
+                    element={<AuthPage />}
+                  />
+                  <Route
+                    path="/dashboard"
+                    element={
+                      <ProtectedRoute>
+                        <Dashboard />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/settings"
+                    element={
+                      <ProtectedRoute>
+                        <Settings />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="*"
+                    element={
+                      <Navigate
+                        to="/"
+                        replace
+                      />
+                    }
+                  />
+                </Routes>
+              </Layout>
+            </Router>
+          </HelmetProvider>
+        </AuthProvider>
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 };
 
