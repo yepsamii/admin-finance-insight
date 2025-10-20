@@ -1,21 +1,7 @@
 import { Link } from "react-router-dom";
+import { formatDate, calculateReadingTime } from "../utils/dateFormatter";
 
 const PostDetail = ({ post }) => {
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-  };
-
-  const readingTime = (content) => {
-    const wordsPerMinute = 200;
-    const words = content.split(/\s+/).length;
-    const minutes = Math.ceil(words / wordsPerMinute);
-    return minutes;
-  };
-
   if (!post) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
@@ -162,7 +148,7 @@ const PostDetail = ({ post }) => {
               />
             </svg>
             <span className="font-medium">
-              {readingTime(post.content)} min read
+              {calculateReadingTime(post.content)} min read
             </span>
           </div>
 

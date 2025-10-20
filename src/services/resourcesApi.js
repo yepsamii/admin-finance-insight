@@ -1,31 +1,16 @@
 import { supabase } from "../lib/supabase";
+import {
+  getFileExtension,
+  getFileIcon,
+  formatFileSize,
+} from "../utils/fileHelpers";
+import {
+  ALLOWED_DOCUMENT_TYPES,
+  MAX_DOCUMENT_SIZE,
+} from "../constants/fileTypes";
 
-// Helper function to get file extension
-const getFileExtension = (filename) => {
-  return filename.slice(((filename.lastIndexOf(".") - 1) >>> 0) + 2);
-};
-
-// Helper function to format file size
-export const formatFileSize = (bytes) => {
-  if (!bytes) return "0 Bytes";
-  const k = 1024;
-  const sizes = ["Bytes", "KB", "MB", "GB"];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + " " + sizes[i];
-};
-
-// Helper function to get file icon
-export const getFileIcon = (fileType) => {
-  if (fileType.includes("pdf")) return "📄";
-  if (fileType.includes("word") || fileType.includes("doc")) return "📝";
-  if (fileType.includes("excel") || fileType.includes("spreadsheet"))
-    return "📊";
-  if (fileType.includes("powerpoint") || fileType.includes("presentation"))
-    return "📽️";
-  if (fileType.includes("text") || fileType.includes("markdown")) return "📃";
-  if (fileType.includes("zip") || fileType.includes("archive")) return "📦";
-  return "📎";
-};
+// Re-export utilities for backward compatibility
+export { formatFileSize, getFileIcon };
 
 // STORAGE API for Resources
 export const resourceStorageApi = {
@@ -35,29 +20,14 @@ export const resourceStorageApi = {
     if (!user) throw new Error("User not authenticated");
 
     // Validate file type
-    const allowedTypes = [
-      "application/pdf",
-      "application/msword",
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-      "application/vnd.ms-excel",
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-      "application/vnd.ms-powerpoint",
-      "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-      "text/plain",
-      "text/markdown",
-      "application/zip",
-      "application/x-zip-compressed",
-    ];
-
-    if (!allowedTypes.includes(file.type)) {
+    if (!ALLOWED_DOCUMENT_TYPES.includes(file.type)) {
       throw new Error(
         "Invalid file type. Allowed types: PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX, TXT, MD, ZIP"
       );
     }
 
-    // Validate file size (max 50MB)
-    const maxSize = 50 * 1024 * 1024; // 50MB
-    if (file.size > maxSize) {
+    // Validate file size
+    if (file.size > MAX_DOCUMENT_SIZE) {
       throw new Error("File size too large. Maximum size is 50MB");
     }
 

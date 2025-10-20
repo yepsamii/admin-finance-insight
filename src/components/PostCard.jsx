@@ -1,19 +1,8 @@
 import { Link } from "react-router-dom";
+import { formatDate } from "../utils/dateFormatter";
+import { truncateText } from "../utils/textHelpers";
 
 const PostCard = ({ post, showActions = false, onEdit, onDelete }) => {
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-  };
-
-  const truncateText = (text, maxLength = 150) => {
-    if (text.length <= maxLength) return text;
-    return text.substring(0, maxLength) + "...";
-  };
-
   return (
     <article className="group bg-white rounded-2xl overflow-hidden hover:shadow-2xl transition-all duration-500 border border-gray-100 hover:border-blue-200 hover:-translate-y-2">
       {/* Header Image */}

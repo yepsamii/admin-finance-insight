@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { categoriesApi, tagsApi, storageApi } from "../services/blogApi";
+import { ALLOWED_IMAGE_TYPES, MAX_IMAGE_SIZE } from "../constants/fileTypes";
 
 const PostForm = ({ post = null, onSubmit, onCancel, isLoading = false }) => {
   const [formData, setFormData] = useState({
@@ -83,14 +84,7 @@ const PostForm = ({ post = null, onSubmit, onCancel, isLoading = false }) => {
     if (!file) return;
 
     // Validate file type
-    const validTypes = [
-      "image/jpeg",
-      "image/jpg",
-      "image/png",
-      "image/gif",
-      "image/webp",
-    ];
-    if (!validTypes.includes(file.type)) {
+    if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
       setErrors((prev) => ({
         ...prev,
         header_image_url:
@@ -99,9 +93,8 @@ const PostForm = ({ post = null, onSubmit, onCancel, isLoading = false }) => {
       return;
     }
 
-    // Validate file size (5MB max)
-    const maxSize = 5 * 1024 * 1024; // 5MB
-    if (file.size > maxSize) {
+    // Validate file size
+    if (file.size > MAX_IMAGE_SIZE) {
       setErrors((prev) => ({
         ...prev,
         header_image_url: "Image size must be less than 5MB",

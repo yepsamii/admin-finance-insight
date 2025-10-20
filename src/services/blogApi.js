@@ -1,14 +1,6 @@
 import { supabase } from "../lib/supabase";
-
-// Helper function to generate slug from title
-const generateSlug = (title) => {
-  return title
-    .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, "")
-    .replace(/\s+/g, "-")
-    .replace(/-+/g, "-")
-    .trim("-");
-};
+import { generateSlug } from "../utils/textHelpers";
+import { ALLOWED_IMAGE_TYPES, MAX_IMAGE_SIZE } from "../constants/fileTypes";
 
 // STORAGE API
 export const storageApi = {
@@ -16,6 +8,18 @@ export const storageApi = {
   async uploadImage(file) {
     const { user } = (await supabase.auth.getUser()).data;
     if (!user) throw new Error("User not authenticated");
+
+    // Validate file type
+    if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+      throw new Error(
+        "Invalid file type. Please upload a valid image file (JPEG, PNG, GIF, or WebP)"
+      );
+    }
+
+    // Validate file size
+    if (file.size > MAX_IMAGE_SIZE) {
+      throw new Error("Image size must be less than 5MB");
+    }
 
     // Generate unique filename
     const fileExt = file.name.split(".").pop();

@@ -11,11 +11,9 @@ const Layout = ({ children }) => {
 
   const handleLogout = async () => {
     setIsLoggingOut(true);
-    console.log("Starting logout...");
 
     try {
       await signOut();
-      console.log("Logout successful, navigating home...");
     } catch (err) {
       console.error("Logout error:", err);
     } finally {
