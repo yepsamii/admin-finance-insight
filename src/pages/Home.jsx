@@ -24,88 +24,6 @@ const Home = () => {
       </Helmet>
 
       <div className="min-h-screen">
-        {/* Hero Section */}
-        <section className="relative overflow-hidden bg-gradient-to-br from-blue-600 via-blue-700 to-purple-700 text-white py-20 md:py-28">
-          {/* Background Decorations */}
-          <div className="absolute inset-0 opacity-10">
-            <div className="absolute top-0 left-0 w-96 h-96 bg-white rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2"></div>
-            <div className="absolute bottom-0 right-0 w-96 h-96 bg-purple-300 rounded-full blur-3xl translate-x-1/2 translate-y-1/2"></div>
-          </div>
-
-          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center">
-              {/* Badge */}
-              <div className="inline-flex items-center px-4 py-2 bg-white/10 backdrop-blur-lg rounded-full text-sm font-medium mb-6 border border-white/20 animate-fade-in">
-                <svg
-                  className="w-4 h-4 mr-2"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                </svg>
-                Expert Financial Insights & Analysis
-              </div>
-
-              {/* Main Heading */}
-              <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight">
-                Master Your
-                <span className="block bg-gradient-to-r from-yellow-200 to-pink-200 bg-clip-text text-transparent">
-                  Financial Future
-                </span>
-              </h1>
-
-              {/* Description */}
-              <p className="text-lg md:text-xl text-blue-100 max-w-3xl mx-auto mb-10 leading-relaxed">
-                Discover data-driven insights, expert analysis, and practical
-                guidance to make informed financial decisions. Stay ahead with
-                the latest trends, strategies, and market intelligence.
-              </p>
-
-              {/* CTA Buttons */}
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                <a
-                  href="#posts"
-                  className="px-8 py-4 bg-white text-blue-700 rounded-xl font-semibold hover:bg-blue-50 transition-all duration-200 shadow-xl hover:shadow-2xl hover:scale-105 active:scale-95"
-                >
-                  Explore Articles
-                </a>
-                <a
-                  href="#subscribe"
-                  className="px-8 py-4 bg-white/10 backdrop-blur-lg text-white rounded-xl font-semibold hover:bg-white/20 transition-all duration-200 border border-white/30 active:scale-95"
-                >
-                  Subscribe for Updates
-                </a>
-              </div>
-
-              {/* Stats */}
-              <div className="mt-16 grid grid-cols-3 gap-8 max-w-3xl mx-auto">
-                <div className="text-center">
-                  <div className="text-3xl md:text-4xl font-bold mb-2">
-                    {posts?.length || 0}+
-                  </div>
-                  <div className="text-blue-200 text-sm md:text-base">
-                    Published Articles
-                  </div>
-                </div>
-                <div className="text-center">
-                  <div className="text-3xl md:text-4xl font-bold mb-2">
-                    10K+
-                  </div>
-                  <div className="text-blue-200 text-sm md:text-base">
-                    Monthly Readers
-                  </div>
-                </div>
-                <div className="text-center">
-                  <div className="text-3xl md:text-4xl font-bold mb-2">5+</div>
-                  <div className="text-blue-200 text-sm md:text-base">
-                    Years Experience
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
         {/* Posts Section */}
         <section
           id="posts"
@@ -220,8 +138,6 @@ const Home = () => {
             )}
           </div>
         </section>
-
-        {/* Newsletter Section */}
       </div>
     </>
   );
