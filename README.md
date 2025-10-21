@@ -327,6 +327,32 @@ npm run build
 npm run preview
 ```
 
+## 🚀 Deployment & CI/CD
+
+This project is configured for automatic deployment to Vercel with GitHub Actions.
+
+### Quick Setup
+
+1. **Run the setup script:**
+
+   ```bash
+   ./setup-vercel-secrets.sh
+   ```
+
+2. **Add GitHub secrets** as instructed by the script
+
+3. **Push to main branch** to trigger automatic deployment
+
+### Features
+
+- ✅ **Auto-deploy on push to main** - Production deployment
+- ✅ **Preview deployments on PRs** - Test before merging
+- ✅ **Custom domain support** - Your GoDaddy domain
+- ✅ **Optimized builds** - Vite production builds
+- ✅ **Asset caching** - 1-year cache for static assets
+
+**[→ Full Deployment Guide](./DEPLOYMENT.md)**
+
 ## 📝 BlockNote Editor Integration
 
 This project includes a fully integrated BlockNote rich text editor with Supabase storage:
