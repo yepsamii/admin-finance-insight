@@ -7,11 +7,10 @@ import {
 import { HelmetProvider } from "react-helmet-async";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Layout from "./components/Layout";
-import Home from "./pages/Home";
+import Blog from "./pages/Blog";
 import Dashboard from "./pages/Dashboard";
 import AuthPage from "./pages/AuthPage";
 import PostPage from "./pages/PostPage";
-import Settings from "./pages/Settings";
 import Resources from "./pages/Resources";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
@@ -55,7 +54,7 @@ const App = () => {
                 <Routes>
                   <Route
                     path="/"
-                    element={<Home />}
+                    element={<Blog />}
                   />
                   <Route
                     path="/post/:slug"
@@ -74,14 +73,6 @@ const App = () => {
                     element={
                       <ProtectedRoute>
                         <Dashboard />
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
-                    path="/settings"
-                    element={
-                      <ProtectedRoute>
-                        <Settings />
                       </ProtectedRoute>
                     }
                   />

@@ -3,7 +3,7 @@ import { Helmet } from "react-helmet-async";
 import { postsApi } from "../services/blogApi";
 import PostCard from "../components/PostCard";
 
-const Home = () => {
+const Blog = () => {
   const {
     data: posts,
     isLoading,
@@ -16,7 +16,9 @@ const Home = () => {
   return (
     <>
       <Helmet>
-        <title>Finance Insights - Expert Financial Analysis & Guidance</title>
+        <title>
+          Blog - Finance Insights | Expert Financial Analysis & Guidance
+        </title>
         <meta
           name="description"
           content="Discover expert financial insights, analysis, and guidance to make informed financial decisions."
@@ -24,23 +26,24 @@ const Home = () => {
       </Helmet>
 
       <div className="min-h-screen">
-        {/* Posts Section */}
-        <section
-          id="posts"
-          className="py-16 md:py-24"
-        >
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            {/* Section Header */}
-            <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-                Latest Insights
-              </h2>
-              <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+        {/* Hero Section */}
+        <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+            <div className="text-center">
+              <h1 className="text-4xl md:text-5xl font-bold mb-4">
+                📝 Financial Insights Blog
+              </h1>
+              <p className="text-xl text-blue-100 max-w-2xl mx-auto">
                 Explore our latest articles on financial planning, investment
                 strategies, and market analysis
               </p>
             </div>
+          </div>
+        </div>
 
+        {/* Posts Section */}
+        <section className="py-16 md:py-24 bg-gradient-to-br from-gray-50 via-white to-blue-50/30">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             {/* Loading State */}
             {isLoading && (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -86,16 +89,27 @@ const Home = () => {
 
             {/* Posts Grid */}
             {posts && posts.length > 0 && (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 animate-slide-in-up">
-                {posts.map((post, index) => (
-                  <div
-                    key={post.id}
-                    style={{ animationDelay: `${index * 0.1}s` }}
-                  >
-                    <PostCard post={post} />
-                  </div>
-                ))}
-              </div>
+              <>
+                <div className="mb-8 text-center">
+                  <h2 className="text-3xl font-bold text-gray-900 mb-2">
+                    Latest Posts
+                  </h2>
+                  <p className="text-gray-600">
+                    {posts.length} {posts.length === 1 ? "article" : "articles"}{" "}
+                    published
+                  </p>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 animate-slide-in-up">
+                  {posts.map((post, index) => (
+                    <div
+                      key={post.id}
+                      style={{ animationDelay: `${index * 0.1}s` }}
+                    >
+                      <PostCard post={post} />
+                    </div>
+                  ))}
+                </div>
+              </>
             )}
 
             {/* Empty State */}
@@ -143,4 +157,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default Blog;

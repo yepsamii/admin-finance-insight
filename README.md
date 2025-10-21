@@ -241,16 +241,19 @@ CREATE POLICY "Admins can manage resource tags" ON resource_tags FOR ALL USING (
 Create these storage buckets in Supabase Storage:
 
 1. **post-images** (for blog header/cover images)
+
    - Public bucket
    - Allowed MIME types: `image/jpeg, image/jpg, image/png, image/gif, image/webp`
    - Max file size: 5MB
 
 2. **post-content-images** (for images in blog content - BlockNote)
+
    - Public bucket
    - Allowed MIME types: `image/jpeg, image/jpg, image/png, image/gif, image/webp`
    - Max file size: 5MB
 
 3. **post-content-videos** (for videos in blog content - BlockNote)
+
    - Public bucket
    - Allowed MIME types: `video/mp4, video/mpeg, video/quicktime, video/webm, video/ogg`
    - Max file size: 100MB

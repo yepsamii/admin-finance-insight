@@ -1,31 +1,22 @@
 import { useState } from "react";
 import { Helmet } from "react-helmet-async";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { resourcesApi } from "../services/resourcesApi";
 import { categoriesApi } from "../services/blogApi";
 import ResourceCard from "../components/ResourceCard";
-import ResourceForm from "../components/ResourceForm";
-import { useAuth } from "../contexts/AuthContext";
 
 const Resources = () => {
-  const { user } = useAuth();
-  const queryClient = useQueryClient();
-  const [showForm, setShowForm] = useState(false);
-  const [editingResource, setEditingResource] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Fetch resources
+  // Fetch only published resources (public view)
   const {
     data: resources,
     isLoading: resourcesLoading,
     error: resourcesError,
   } = useQuery({
-    queryKey: ["resources", user?.id],
-    queryFn: () =>
-      user
-        ? resourcesApi.getAllResources()
-        : resourcesApi.getPublishedResources(),
+    queryKey: ["resources"],
+    queryFn: resourcesApi.getPublishedResources,
   });
 
   // Fetch categories
@@ -33,70 +24,6 @@ const Resources = () => {
     queryKey: ["categories"],
     queryFn: categoriesApi.getAll,
   });
-
-  // Create mutation
-  const createMutation = useMutation({
-    mutationFn: resourcesApi.createResource,
-    onSuccess: () => {
-      queryClient.invalidateQueries(["resources"]);
-      setShowForm(false);
-      alert("Resource uploaded successfully!");
-    },
-    onError: (error) => {
-      alert(error.message || "Failed to upload resource");
-    },
-  });
-
-  // Update mutation
-  const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => resourcesApi.updateResource(id, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries(["resources"]);
-      setShowForm(false);
-      setEditingResource(null);
-      alert("Resource updated successfully!");
-    },
-    onError: (error) => {
-      alert(error.message || "Failed to update resource");
-    },
-  });
-
-  // Delete mutation
-  const deleteMutation = useMutation({
-    mutationFn: resourcesApi.deleteResource,
-    onSuccess: () => {
-      queryClient.invalidateQueries(["resources"]);
-      alert("Resource deleted successfully!");
-    },
-    onError: (error) => {
-      alert(error.message || "Failed to delete resource");
-    },
-  });
-
-  const handleSubmit = async (resourceData) => {
-    if (editingResource) {
-      await updateMutation.mutateAsync({
-        id: editingResource.id,
-        data: resourceData,
-      });
-    } else {
-      await createMutation.mutateAsync(resourceData);
-    }
-  };
-
-  const handleEdit = (resource) => {
-    setEditingResource(resource);
-    setShowForm(true);
-  };
-
-  const handleDelete = async (id) => {
-    await deleteMutation.mutateAsync(id);
-  };
-
-  const handleCancelForm = () => {
-    setShowForm(false);
-    setEditingResource(null);
-  };
 
   // Filter resources
   const filteredResources = resources?.filter((resource) => {
@@ -137,45 +64,6 @@ const Resources = () => {
 
         {/* Main Content */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          {/* Admin Actions */}
-          {user && !showForm && (
-            <div className="mb-8">
-              <button
-                onClick={() => setShowForm(true)}
-                className="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-lg hover:shadow-xl font-semibold flex items-center space-x-2"
-              >
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                  />
-                </svg>
-                <span>Upload New Resource</span>
-              </button>
-            </div>
-          )}
-
-          {/* Upload/Edit Form */}
-          {showForm && (
-            <div className="mb-8 bg-white rounded-xl shadow-lg p-6 border border-gray-200">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">
-                {editingResource ? "Edit Resource" : "Upload New Resource"}
-              </h2>
-              <ResourceForm
-                resource={editingResource}
-                onSubmit={handleSubmit}
-                onCancel={handleCancelForm}
-              />
-            </div>
-          )}
-
           {/* Filters and Search */}
           <div className="mb-8 bg-white rounded-xl shadow-md p-6 border border-gray-200">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -286,9 +174,9 @@ const Resources = () => {
                   <ResourceCard
                     key={resource.id}
                     resource={resource}
-                    onEdit={user ? handleEdit : null}
-                    onDelete={user ? handleDelete : null}
-                    isAdmin={!!user}
+                    onEdit={null}
+                    onDelete={null}
+                    isAdmin={false}
                   />
                 ))}
               </div>
