@@ -21,13 +21,39 @@ export const formatDate = (dateString, options = {}) => {
 
 /**
  * Calculate reading time based on content
- * @param {string} content - Text content
+ * @param {string} content - Text content or JSON string
  * @param {number} wordsPerMinute - Average reading speed (default: 200)
  * @returns {number} Reading time in minutes
  */
 export const calculateReadingTime = (content, wordsPerMinute = 200) => {
-  const words = content.split(/\s+/).length;
-  return Math.ceil(words / wordsPerMinute);
+  let textContent = content;
+
+  // Try to parse as BlockNote JSON
+  try {
+    const blocks = JSON.parse(content);
+    if (Array.isArray(blocks)) {
+      // Extract text from BlockNote blocks
+      textContent = blocks
+        .map((block) => {
+          if (block.content) {
+            if (Array.isArray(block.content)) {
+              return block.content.map((c) => c.text || "").join("");
+            }
+            return block.content;
+          }
+          return "";
+        })
+        .join(" ");
+    }
+  } catch {
+    // If not JSON, use content as is
+    textContent = content;
+  }
+
+  const words = textContent
+    .split(/\s+/)
+    .filter((word) => word.length > 0).length;
+  return Math.max(1, Math.ceil(words / wordsPerMinute));
 };
 
 /**

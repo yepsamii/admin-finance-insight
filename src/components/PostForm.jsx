@@ -1,6 +1,10 @@
 import { useState, useEffect } from "react";
 import { categoriesApi, tagsApi, storageApi } from "../services/blogApi";
 import { ALLOWED_IMAGE_TYPES, MAX_IMAGE_SIZE } from "../constants/fileTypes";
+import { useCreateBlockNote } from "@blocknote/react";
+import { BlockNoteView } from "@blocknote/mantine";
+import "@blocknote/core/fonts/inter.css";
+import "@blocknote/mantine/style.css";
 
 const PostForm = ({ post = null, onSubmit, onCancel, isLoading = false }) => {
   const [formData, setFormData] = useState({
@@ -20,6 +24,9 @@ const PostForm = ({ post = null, onSubmit, onCancel, isLoading = false }) => {
   const [imageInputMode, setImageInputMode] = useState("url"); // 'url' or 'upload'
   const [uploadingImage, setUploadingImage] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+
+  // Initialize BlockNote editor
+  const editor = useCreateBlockNote();
 
   useEffect(() => {
     const loadData = async () => {
@@ -51,8 +58,25 @@ const PostForm = ({ post = null, onSubmit, onCancel, isLoading = false }) => {
         tags: post.post_tags ? post.post_tags.map((pt) => pt.tags.id) : [],
         published: post.published || false,
       });
+
+      // Update editor content if post exists
+      if (post.content) {
+        try {
+          const blocks = JSON.parse(post.content);
+          editor.replaceBlocks(editor.document, blocks);
+        } catch (error) {
+          // If content is not valid JSON, treat it as plain text
+          console.error("Error parsing content:", error);
+          editor.replaceBlocks(editor.document, [
+            {
+              type: "paragraph",
+              content: post.content,
+            },
+          ]);
+        }
+      }
     }
-  }, [post]);
+  }, [post, editor]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -66,6 +90,22 @@ const PostForm = ({ post = null, onSubmit, onCancel, isLoading = false }) => {
       setErrors((prev) => ({
         ...prev,
         [name]: "",
+      }));
+    }
+  };
+
+  const handleEditorChange = () => {
+    const blocks = editor.document;
+    setFormData((prev) => ({
+      ...prev,
+      content: JSON.stringify(blocks),
+    }));
+
+    // Clear content error when user starts typing
+    if (errors.content) {
+      setErrors((prev) => ({
+        ...prev,
+        content: "",
       }));
     }
   };
@@ -162,7 +202,19 @@ const PostForm = ({ post = null, onSubmit, onCancel, isLoading = false }) => {
       newErrors.title = "Title is required";
     }
 
-    if (!formData.content.trim()) {
+    // Check if editor has content (more than just empty blocks)
+    const blocks = editor.document;
+    const hasContent = blocks.some((block) => {
+      if (block.content) {
+        if (Array.isArray(block.content)) {
+          return block.content.some((c) => c.text && c.text.trim());
+        }
+        return block.content.trim && block.content.trim();
+      }
+      return false;
+    });
+
+    if (!hasContent) {
       newErrors.content = "Content is required";
     }
 
@@ -519,18 +571,18 @@ const PostForm = ({ post = null, onSubmit, onCancel, isLoading = false }) => {
         >
           Article Content *
         </label>
-        <textarea
-          id="content"
-          name="content"
-          value={formData.content}
-          onChange={handleChange}
-          rows={16}
-          className={`textarea-field font-mono text-sm ${
-            errors.content ? "input-error" : ""
+        <div
+          className={`border-2 rounded-xl overflow-hidden ${
+            errors.content ? "border-red-500" : "border-gray-200"
           }`}
-          placeholder="Write your article content here... Use markdown for formatting."
-        />
-        {errors.content ? (
+        >
+          <BlockNoteView
+            editor={editor}
+            onChange={handleEditorChange}
+            theme="light"
+          />
+        </div>
+        {errors.content && (
           <div className="mt-2 flex items-center text-sm text-red-600">
             <svg
               className="w-4 h-4 mr-1"
@@ -544,14 +596,6 @@ const PostForm = ({ post = null, onSubmit, onCancel, isLoading = false }) => {
               />
             </svg>
             {errors.content}
-          </div>
-        ) : (
-          <div className="mt-2 flex items-center justify-between text-xs text-gray-500">
-            <span>
-              {formData.content.split(/\s+/).length} words ·{" "}
-              {Math.ceil(formData.content.split(/\s+/).length / 200)} min read
-            </span>
-            <span>Markdown supported</span>
           </div>
         )}
       </div>

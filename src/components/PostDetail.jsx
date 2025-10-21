@@ -1,7 +1,33 @@
 import { Link } from "react-router-dom";
 import { formatDate, calculateReadingTime } from "../utils/dateFormatter";
+import { useCreateBlockNote } from "@blocknote/react";
+import { BlockNoteView } from "@blocknote/mantine";
+import { useEffect } from "react";
+import "@blocknote/core/fonts/inter.css";
+import "@blocknote/mantine/style.css";
 
 const PostDetail = ({ post }) => {
+  // Initialize BlockNote editor in read-only mode
+  const editor = useCreateBlockNote({ editable: false });
+
+  useEffect(() => {
+    if (post && post.content) {
+      try {
+        const blocks = JSON.parse(post.content);
+        editor.replaceBlocks(editor.document, blocks);
+      } catch (error) {
+        // If content is not valid JSON, treat it as plain text
+        console.error("Error parsing content:", error);
+        editor.replaceBlocks(editor.document, [
+          {
+            type: "paragraph",
+            content: post.content,
+          },
+        ]);
+      }
+    }
+  }, [post, editor]);
+
   if (!post) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
@@ -211,9 +237,11 @@ const PostDetail = ({ post }) => {
 
         {/* Content */}
         <div className="blog-content prose prose-lg max-w-none mb-12">
-          <div className="text-gray-800 leading-relaxed text-lg whitespace-pre-wrap">
-            {post.content}
-          </div>
+          <BlockNoteView
+            editor={editor}
+            theme="light"
+            editable={false}
+          />
         </div>
 
         {/* Bottom Navigation & CTA */}
