@@ -1,13 +1,15 @@
 # Finance Insights - Admin Portal
 
-A modern, full-featured blog and resource management platform built with React, Supabase, and Tailwind CSS.
+A modern, full-featured blog and resource management platform built with React, Supabase, BlockNote, and Tailwind CSS.
+
+> 📚 **[View Complete Documentation →](./DOCS.md)**
 
 ## 🚀 Features
 
 ### Blog Management
 
-- ✍️ **Rich Content Editor** - Create and edit blog posts with markdown support
-- 🖼️ **Image Uploads** - Direct upload to Supabase Storage with validation
+- ✍️ **Rich Content Editor** - BlockNote editor with image/video upload support
+- 🖼️ **Media Uploads** - Direct upload to Supabase Storage (images & videos)
 - 🏷️ **Categories & Tags** - Organize content with flexible taxonomy
 - 📝 **Draft System** - Save drafts before publishing
 - 🔍 **SEO Optimized** - Dynamic meta tags and helmet integration
@@ -236,18 +238,29 @@ CREATE POLICY "Admins can manage resource tags" ON resource_tags FOR ALL USING (
 
 #### Storage Buckets
 
-Create two storage buckets in Supabase Storage:
+Create these storage buckets in Supabase Storage:
 
-1. **post-images** (for blog post images)
-
+1. **post-images** (for blog header/cover images)
    - Public bucket
    - Allowed MIME types: `image/jpeg, image/jpg, image/png, image/gif, image/webp`
    - Max file size: 5MB
 
-2. **resource-files** (for downloadable resources)
+2. **post-content-images** (for images in blog content - BlockNote)
+   - Public bucket
+   - Allowed MIME types: `image/jpeg, image/jpg, image/png, image/gif, image/webp`
+   - Max file size: 5MB
+
+3. **post-content-videos** (for videos in blog content - BlockNote)
+   - Public bucket
+   - Allowed MIME types: `video/mp4, video/mpeg, video/quicktime, video/webm, video/ogg`
+   - Max file size: 100MB
+
+4. **resource-files** (for downloadable resources)
    - Public bucket
    - Allowed MIME types: Various document types
    - Max file size: 50MB
+
+> 📝 **Note:** For detailed BlockNote storage setup, see [supabase-storage-setup.sql](./supabase-storage-setup.sql)
 
 Storage RLS policies:
 
@@ -310,6 +323,18 @@ Visit `http://localhost:5173` to see your application.
 npm run build
 npm run preview
 ```
+
+## 📝 BlockNote Editor Integration
+
+This project includes a fully integrated BlockNote rich text editor with Supabase storage:
+
+- **Images & Videos** - Upload and embed directly in content
+- **Drag & Drop** - Drag files into the editor
+- **Paste Support** - Paste images from clipboard
+- **Auto Upload** - Files automatically upload to Supabase
+- **Custom Blocks** - Audio and File blocks removed for cleaner experience
+
+**[→ BlockNote Setup Guide](./BLOCKNOTE_SETUP_CHECKLIST.md)**
 
 ## 📁 Project Structure
 

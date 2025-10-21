@@ -1,6 +1,11 @@
 import { supabase } from "../lib/supabase";
 import { generateSlug } from "../utils/textHelpers";
-import { ALLOWED_IMAGE_TYPES, MAX_IMAGE_SIZE } from "../constants/fileTypes";
+import {
+  ALLOWED_IMAGE_TYPES,
+  ALLOWED_VIDEO_TYPES,
+  MAX_IMAGE_SIZE,
+  MAX_VIDEO_SIZE,
+} from "../constants/fileTypes";
 
 // STORAGE API
 export const storageApi = {
@@ -65,6 +70,88 @@ export const storageApi = {
       }
     } catch (error) {
       console.error("Error deleting image:", error);
+      // Don't throw error as this is not critical
+    }
+  },
+
+  // Upload file for BlockNote editor (images and videos within content)
+  async uploadContentFile(file) {
+    const { user } = (await supabase.auth.getUser()).data;
+    if (!user) throw new Error("User not authenticated");
+
+    // Determine if it's an image or video
+    const isImage = ALLOWED_IMAGE_TYPES.includes(file.type);
+    const isVideo = ALLOWED_VIDEO_TYPES.includes(file.type);
+
+    if (!isImage && !isVideo) {
+      throw new Error(
+        "Invalid file type. Please upload an image (JPEG, PNG, GIF, WebP) or video (MP4, MPEG, MOV, WebM, OGG)"
+      );
+    }
+
+    // Validate file size
+    if (isImage && file.size > MAX_IMAGE_SIZE) {
+      throw new Error("Image size must be less than 5MB");
+    }
+
+    if (isVideo && file.size > MAX_VIDEO_SIZE) {
+      throw new Error("Video size must be less than 100MB");
+    }
+
+    // Generate unique filename
+    const fileExt = file.name.split(".").pop();
+    const timestamp = Date.now();
+    const randomStr = Math.random().toString(36).substring(7);
+    const fileName = `${user.id}/${timestamp}-${randomStr}.${fileExt}`;
+
+    // Choose the appropriate storage bucket
+    const bucketName = isImage ? "post-content-images" : "post-content-videos";
+
+    // Upload to Supabase Storage
+    const { data, error } = await supabase.storage
+      .from(bucketName)
+      .upload(fileName, file, {
+        cacheControl: "3600",
+        upsert: false,
+      });
+
+    if (error) throw error;
+
+    // Get public URL
+    const {
+      data: { publicUrl },
+    } = supabase.storage.from(bucketName).getPublicUrl(data.path);
+
+    return publicUrl;
+  },
+
+  // Delete content file (image or video) from Supabase Storage
+  async deleteContentFile(fileUrl) {
+    if (!fileUrl) return;
+
+    try {
+      // Extract path from URL
+      const url = new URL(fileUrl);
+      const imageMatch = url.pathname.match(/\/post-content-images\/(.+)/);
+      const videoMatch = url.pathname.match(/\/post-content-videos\/(.+)/);
+
+      if (imageMatch && imageMatch[1]) {
+        const filePath = imageMatch[1];
+        const { error } = await supabase.storage
+          .from("post-content-images")
+          .remove([filePath]);
+
+        if (error) throw error;
+      } else if (videoMatch && videoMatch[1]) {
+        const filePath = videoMatch[1];
+        const { error } = await supabase.storage
+          .from("post-content-videos")
+          .remove([filePath]);
+
+        if (error) throw error;
+      }
+    } catch (error) {
+      console.error("Error deleting content file:", error);
       // Don't throw error as this is not critical
     }
   },

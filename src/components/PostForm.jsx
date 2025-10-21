@@ -3,8 +3,17 @@ import { categoriesApi, tagsApi, storageApi } from "../services/blogApi";
 import { ALLOWED_IMAGE_TYPES, MAX_IMAGE_SIZE } from "../constants/fileTypes";
 import { useCreateBlockNote } from "@blocknote/react";
 import { BlockNoteView } from "@blocknote/mantine";
+import { BlockNoteSchema, defaultBlockSpecs } from "@blocknote/core";
 import "@blocknote/core/fonts/inter.css";
 import "@blocknote/mantine/style.css";
+
+// Create schema without audio and file blocks (outside component to avoid recreation)
+// eslint-disable-next-line no-unused-vars
+const { audio, file, ...allowedBlockSpecs } = defaultBlockSpecs;
+
+const customSchema = BlockNoteSchema.create({
+  blockSpecs: allowedBlockSpecs,
+});
 
 const PostForm = ({ post = null, onSubmit, onCancel, isLoading = false }) => {
   const [formData, setFormData] = useState({
@@ -25,8 +34,20 @@ const PostForm = ({ post = null, onSubmit, onCancel, isLoading = false }) => {
   const [uploadingImage, setUploadingImage] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
 
-  // Initialize BlockNote editor
-  const editor = useCreateBlockNote();
+  // Initialize BlockNote editor with custom upload handler and schema
+  const editor = useCreateBlockNote({
+    schema: customSchema,
+    uploadFile: async (file) => {
+      try {
+        // Upload file to Supabase storage
+        const url = await storageApi.uploadContentFile(file);
+        return url;
+      } catch (error) {
+        console.error("Error uploading file in BlockNote:", error);
+        throw error;
+      }
+    },
+  });
 
   useEffect(() => {
     const loadData = async () => {

@@ -10,6 +10,14 @@ export const ALLOWED_IMAGE_TYPES = [
   "image/webp",
 ];
 
+export const ALLOWED_VIDEO_TYPES = [
+  "video/mp4",
+  "video/mpeg",
+  "video/quicktime",
+  "video/webm",
+  "video/ogg",
+];
+
 export const ALLOWED_DOCUMENT_TYPES = [
   "application/pdf",
   "application/msword",
@@ -25,6 +33,7 @@ export const ALLOWED_DOCUMENT_TYPES = [
 ];
 
 export const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB
+export const MAX_VIDEO_SIZE = 100 * 1024 * 1024; // 100MB
 export const MAX_DOCUMENT_SIZE = 50 * 1024 * 1024; // 50MB
 
 export const FILE_UPLOAD_ERRORS = {
