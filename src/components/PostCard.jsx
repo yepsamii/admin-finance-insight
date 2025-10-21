@@ -4,7 +4,7 @@ import { truncateText } from "../utils/textHelpers";
 
 const PostCard = ({ post, showActions = false, onEdit, onDelete }) => {
   return (
-    <article className="group bg-white rounded-2xl overflow-hidden hover:shadow-2xl transition-all duration-500 border border-gray-100 hover:border-blue-200 hover:-translate-y-2">
+    <article className="group bg-white rounded overflow-hidden transition-all duration-300 border border-gray-200 hover:border-gray-300">
       {/* Header Image */}
       <Link
         to={`/post/${post.slug}`}
@@ -41,7 +41,7 @@ const PostCard = ({ post, showActions = false, onEdit, onDelete }) => {
         {/* Category Badge - Floating */}
         {post.categories && (
           <div className="absolute top-4 left-4">
-            <span className="inline-flex items-center px-3 py-1.5 bg-white/95 backdrop-blur-sm text-blue-700 text-xs font-semibold rounded-full shadow-lg ring-1 ring-blue-100">
+            <span className="inline-flex items-center px-3 py-1.5 bg-white text-blue-700 text-xs font-semibold rounded border border-blue-200">
               <svg
                 className="w-3 h-3 mr-1.5"
                 fill="currentColor"
@@ -61,7 +61,7 @@ const PostCard = ({ post, showActions = false, onEdit, onDelete }) => {
         {/* Draft Badge */}
         {!post.published && (
           <div className="absolute top-4 right-4">
-            <span className="inline-flex items-center px-3 py-1.5 bg-yellow-100 backdrop-blur-sm text-yellow-800 text-xs font-semibold rounded-full shadow-lg ring-1 ring-yellow-200">
+            <span className="inline-flex items-center px-3 py-1.5 bg-yellow-100 text-yellow-800 text-xs font-semibold rounded border border-yellow-200">
               <svg
                 className="w-3 h-3 mr-1.5"
                 fill="currentColor"
@@ -103,7 +103,7 @@ const PostCard = ({ post, showActions = false, onEdit, onDelete }) => {
             {post.post_tags.slice(0, 3).map((postTag) => (
               <span
                 key={postTag.tags.id}
-                className="inline-flex items-center px-2.5 py-1 bg-gradient-to-r from-gray-50 to-gray-100 text-gray-700 text-xs font-medium rounded-lg ring-1 ring-gray-200"
+                className="inline-flex items-center px-2.5 py-1 bg-gray-100 text-gray-700 text-xs font-medium rounded border border-gray-200"
               >
                 <svg
                   className="w-3 h-3 mr-1 text-gray-400"
@@ -120,7 +120,7 @@ const PostCard = ({ post, showActions = false, onEdit, onDelete }) => {
               </span>
             ))}
             {post.post_tags.length > 3 && (
-              <span className="inline-flex items-center px-2.5 py-1 bg-gradient-to-r from-blue-50 to-purple-50 text-blue-700 text-xs font-medium rounded-lg">
+              <span className="inline-flex items-center px-2.5 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded border border-blue-100">
                 +{post.post_tags.length - 3} more
               </span>
             )}
@@ -155,7 +155,7 @@ const PostCard = ({ post, showActions = false, onEdit, onDelete }) => {
                   e.preventDefault();
                   onEdit(post);
                 }}
-                className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200 active:scale-95"
+                className="p-2 text-blue-600 hover:bg-blue-50 rounded transition-all duration-200"
                 title="Edit post"
               >
                 <svg
@@ -177,7 +177,7 @@ const PostCard = ({ post, showActions = false, onEdit, onDelete }) => {
                   e.preventDefault();
                   onDelete(post);
                 }}
-                className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200 active:scale-95"
+                className="p-2 text-red-600 hover:bg-red-50 rounded transition-all duration-200"
                 title="Delete post"
               >
                 <svg

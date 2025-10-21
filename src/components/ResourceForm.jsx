@@ -182,7 +182,7 @@ const ResourceForm = ({ resource, onSubmit, onCancel }) => {
       className="space-y-6"
     >
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
           {error}
         </div>
       )}
@@ -195,7 +195,7 @@ const ResourceForm = ({ resource, onSubmit, onCancel }) => {
 
         {/* Show uploaded file info */}
         {formData.file_url ? (
-          <div className="border border-gray-300 rounded-lg p-4 bg-gray-50">
+          <div className="border border-gray-300 rounded p-4 bg-gray-50">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
                 <div className="text-3xl">
@@ -224,7 +224,7 @@ const ResourceForm = ({ resource, onSubmit, onCancel }) => {
               <button
                 type="button"
                 onClick={handleRemoveFile}
-                className="px-3 py-1.5 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                className="px-3 py-1.5 text-sm text-red-600 hover:bg-red-50 rounded transition-colors"
               >
                 Remove
               </button>
@@ -238,7 +238,7 @@ const ResourceForm = ({ resource, onSubmit, onCancel }) => {
               onChange={handleFileUpload}
               accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.md,.zip"
               disabled={uploadingFile}
-              className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent file:mr-4 file:py-2.5 file:px-4 file:rounded-l-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700 file:cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              className="block w-full text-sm text-gray-900 border border-gray-300 rounded cursor-pointer bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-l file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700 file:cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             />
 
             {/* Upload Progress */}
@@ -279,7 +279,7 @@ const ResourceForm = ({ resource, onSubmit, onCancel }) => {
           name="title"
           value={formData.title}
           onChange={handleChange}
-          className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+          className="w-full px-4 py-2.5 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all"
           placeholder="Enter resource title"
           required
         />
@@ -299,7 +299,7 @@ const ResourceForm = ({ resource, onSubmit, onCancel }) => {
           value={formData.description}
           onChange={handleChange}
           rows={4}
-          className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none"
+          className="w-full px-4 py-2.5 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all resize-none"
           placeholder="Describe what this resource contains..."
         />
       </div>
@@ -317,7 +317,7 @@ const ResourceForm = ({ resource, onSubmit, onCancel }) => {
           name="category_id"
           value={formData.category_id}
           onChange={handleChange}
-          className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+          className="w-full px-4 py-2.5 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all"
         >
           <option value="">Select a category (optional)</option>
           {categories.map((category) => (
@@ -343,9 +343,9 @@ const ResourceForm = ({ resource, onSubmit, onCancel }) => {
                 key={tag.id}
                 type="button"
                 onClick={() => handleTagToggle(tag.id)}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                className={`px-4 py-2 rounded text-sm font-medium transition-all ${
                   formData.tags.includes(tag.id)
-                    ? "bg-purple-600 text-white shadow-md"
+                    ? "bg-purple-600 text-white"
                     : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                 }`}
               >
@@ -357,7 +357,7 @@ const ResourceForm = ({ resource, onSubmit, onCancel }) => {
       )}
 
       {/* Published Toggle */}
-      <div className="flex items-center space-x-3 p-4 bg-gray-50 rounded-lg">
+      <div className="flex items-center space-x-3 p-4 bg-gray-50 rounded border border-gray-200">
         <input
           type="checkbox"
           id="published"
@@ -379,7 +379,7 @@ const ResourceForm = ({ resource, onSubmit, onCancel }) => {
         <button
           type="submit"
           disabled={uploadingFile || !formData.file_url}
-          className="flex-1 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-md hover:shadow-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex-1 px-6 py-3 bg-blue-600 text-white rounded hover:bg-blue-700 transition-all duration-200 font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {resource ? "Update Resource" : "Create Resource"}
         </button>
@@ -387,7 +387,7 @@ const ResourceForm = ({ resource, onSubmit, onCancel }) => {
           type="button"
           onClick={onCancel}
           disabled={uploadingFile}
-          className="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-all duration-200 font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-6 py-3 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-all duration-200 font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Cancel
         </button>

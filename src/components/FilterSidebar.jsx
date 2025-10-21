@@ -20,7 +20,7 @@ const FilterSidebar = ({
   });
 
   return (
-    <div className="bg-gray-50 rounded-2xl p-6 sticky top-8">
+    <div className="bg-white border border-gray-200 rounded p-6 sticky top-8">
       <h2 className="text-2xl font-bold text-gray-900 mb-6">Filter By</h2>
 
       {/* Categories Filter */}
@@ -47,17 +47,17 @@ const FilterSidebar = ({
                   <button
                     key={category.id}
                     onClick={() => onCategoryChange(category.id)}
-                    className={`w-full flex items-center justify-between p-3 rounded-lg transition-all duration-200 text-left ${
+                    className={`w-full flex items-center justify-between p-3 rounded transition-all duration-200 text-left ${
                       selectedCategory === category.id
-                        ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg"
-                        : "hover:bg-white hover:shadow-md"
+                        ? "bg-blue-600 text-white"
+                        : "hover:bg-gray-50"
                     }`}
                   >
                     <span className="font-semibold text-lg">
                       {category.name}
                     </span>
                     <span
-                      className={`text-sm font-bold px-2.5 py-1 rounded-full ${
+                      className={`text-sm font-bold px-2.5 py-1 rounded ${
                         selectedCategory === category.id
                           ? "bg-white/20"
                           : "bg-gray-200 text-gray-700"
@@ -95,10 +95,10 @@ const FilterSidebar = ({
                   <button
                     key={tag.id}
                     onClick={() => onTagChange(tag.id)}
-                    className={`px-4 py-2 rounded-full text-sm font-semibold transition-all duration-200 ${
+                    className={`px-4 py-2 rounded text-sm font-semibold transition-all duration-200 ${
                       isSelected
-                        ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg scale-105"
-                        : "bg-white text-gray-700 hover:bg-gray-100 hover:shadow-md"
+                        ? "bg-blue-600 text-white"
+                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                     }`}
                   >
                     {tag.name}
@@ -114,7 +114,7 @@ const FilterSidebar = ({
       {(selectedCategory || selectedTags.length > 0) && (
         <button
           onClick={onResetFilters}
-          className="w-full py-3 bg-gray-900 text-white rounded-xl font-semibold hover:bg-gray-800 transition-all duration-200 shadow-lg hover:shadow-xl"
+          className="w-full py-3 bg-gray-900 text-white rounded font-semibold hover:bg-gray-800 transition-all duration-200"
         >
           Reset Filter
         </button>

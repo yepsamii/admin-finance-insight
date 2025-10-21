@@ -35,17 +35,11 @@ export default function AuthPage() {
         />
       </Helmet>
 
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-600 via-blue-700 to-purple-700 py-12 px-4 sm:px-6 lg:px-8">
-        {/* Background Decorations */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-0 left-0 w-96 h-96 bg-white rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2"></div>
-          <div className="absolute bottom-0 right-0 w-96 h-96 bg-purple-300 rounded-full blur-3xl translate-x-1/2 translate-y-1/2"></div>
-        </div>
-
+      <div className="min-h-screen flex items-center justify-center bg-blue-600 py-12 px-4 sm:px-6 lg:px-8">
         <div className="relative max-w-md w-full">
           {/* Header */}
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-white rounded-2xl shadow-xl mb-6">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-white rounded mb-6">
               <svg
                 className="w-10 h-10 text-blue-600"
                 fill="none"
@@ -67,13 +61,13 @@ export default function AuthPage() {
           </div>
 
           {/* Login Card */}
-          <div className="bg-white/95 backdrop-blur-lg rounded-2xl shadow-2xl p-8">
+          <div className="bg-white rounded p-8 border border-gray-200">
             {message.text && (
               <div
-                className={`mb-6 p-4 rounded-xl text-sm font-medium animate-fade-in ${
+                className={`mb-6 p-4 rounded text-sm font-medium animate-fade-in ${
                   message.type === "error"
-                    ? "bg-red-50 text-red-700 border-2 border-red-200"
-                    : "bg-green-50 text-green-700 border-2 border-green-200"
+                    ? "bg-red-50 text-red-700 border border-red-200"
+                    : "bg-green-50 text-green-700 border border-green-200"
                 }`}
               >
                 <div className="flex items-center">
@@ -105,7 +99,7 @@ export default function AuthPage() {
             <button
               onClick={handleGoogleSignIn}
               disabled={loading}
-              className="w-full flex items-center justify-center gap-3 bg-white border-2 border-gray-200 rounded-xl px-6 py-4 text-gray-700 font-semibold hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
+              className="w-full flex items-center justify-center gap-3 bg-white border border-gray-300 rounded px-6 py-4 text-gray-700 font-semibold hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? (
                 <>
@@ -153,7 +147,7 @@ export default function AuthPage() {
             </div>
 
             {/* Info */}
-            <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-4 border border-blue-100">
+            <div className="bg-blue-50 rounded p-4 border border-blue-200">
               <div className="flex items-start">
                 <svg
                   className="w-5 h-5 text-blue-600 mr-3 mt-0.5"

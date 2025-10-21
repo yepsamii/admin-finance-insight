@@ -141,7 +141,7 @@ const CategoryTagSidebar = () => {
   return (
     <div className="w-full bg-white overflow-hidden flex flex-col h-full">
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-purple-600 px-6 py-5 flex-shrink-0">
+      <div className="bg-blue-600 px-6 py-5 flex-shrink-0">
         <h2 className="text-xl font-bold text-white">Manage Content</h2>
         <p className="text-blue-100 text-sm mt-1">Categories & Tags</p>
       </div>
@@ -176,7 +176,7 @@ const CategoryTagSidebar = () => {
         {activeTab === "categories" && (
           <div className="space-y-6">
             {/* Form */}
-            <div className="bg-gradient-to-br from-blue-50 to-blue-100/50 rounded-xl p-6">
+            <div className="bg-blue-50 rounded p-6 border border-blue-100">
               <h3 className="text-lg font-bold text-gray-900 mb-4">
                 {editingCategory ? "Edit Category" : "Add New Category"}
               </h3>
@@ -194,7 +194,7 @@ const CategoryTagSidebar = () => {
                     onChange={(e) =>
                       setCategoryForm({ ...categoryForm, name: e.target.value })
                     }
-                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
                     placeholder="e.g., Finance"
                     required
                   />
@@ -212,7 +212,7 @@ const CategoryTagSidebar = () => {
                       })
                     }
                     rows={3}
-                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none"
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 resize-none"
                     placeholder="Brief description (optional)"
                   />
                 </div>
@@ -223,7 +223,7 @@ const CategoryTagSidebar = () => {
                       createCategoryMutation.isPending ||
                       updateCategoryMutation.isPending
                     }
-                    className="flex-1 px-4 py-2.5 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-200 font-semibold disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
+                    className="flex-1 px-4 py-2.5 bg-blue-600 text-white rounded hover:bg-blue-700 transition-all duration-200 font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {editingCategory ? "Update" : "Add"}
                   </button>
@@ -231,7 +231,7 @@ const CategoryTagSidebar = () => {
                     <button
                       type="button"
                       onClick={handleCancelCategory}
-                      className="px-4 py-2.5 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300 transition-all duration-200 font-semibold"
+                      className="px-4 py-2.5 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-all duration-200 font-semibold"
                     >
                       Cancel
                     </button>
@@ -254,7 +254,7 @@ const CategoryTagSidebar = () => {
                   {categories.map((category) => (
                     <div
                       key={category.id}
-                      className="bg-white border-2 border-gray-100 rounded-xl p-4 hover:border-blue-300 hover:shadow-md transition-all duration-200 group"
+                      className="bg-white border border-gray-200 rounded p-4 hover:border-blue-400 transition-all duration-200 group"
                     >
                       <div className="flex items-start justify-between">
                         <div className="flex-1 min-w-0">
@@ -270,7 +270,7 @@ const CategoryTagSidebar = () => {
                         <div className="flex items-center space-x-1 ml-3">
                           <button
                             onClick={() => handleEditCategory(category)}
-                            className="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-all duration-200"
+                            className="p-2 text-blue-600 hover:bg-blue-100 rounded transition-all duration-200"
                             title="Edit"
                           >
                             <svg
@@ -289,7 +289,7 @@ const CategoryTagSidebar = () => {
                           </button>
                           <button
                             onClick={() => handleDeleteCategory(category.id)}
-                            className="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-all duration-200"
+                            className="p-2 text-red-600 hover:bg-red-100 rounded transition-all duration-200"
                             title="Delete"
                           >
                             <svg
@@ -342,7 +342,7 @@ const CategoryTagSidebar = () => {
         {activeTab === "tags" && (
           <div className="space-y-6">
             {/* Form */}
-            <div className="bg-gradient-to-br from-purple-50 to-purple-100/50 rounded-xl p-6">
+            <div className="bg-purple-50 rounded p-6 border border-purple-100">
               <h3 className="text-lg font-bold text-gray-900 mb-4">
                 {editingTag ? "Edit Tag" : "Add New Tag"}
               </h3>
@@ -358,7 +358,7 @@ const CategoryTagSidebar = () => {
                     type="text"
                     value={tagForm.name}
                     onChange={(e) => setTagForm({ name: e.target.value })}
-                    className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200"
                     placeholder="e.g., Tax Planning"
                     required
                   />
@@ -369,7 +369,7 @@ const CategoryTagSidebar = () => {
                     disabled={
                       createTagMutation.isPending || updateTagMutation.isPending
                     }
-                    className="flex-1 px-4 py-2.5 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-200 font-semibold disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
+                    className="flex-1 px-4 py-2.5 bg-purple-600 text-white rounded hover:bg-purple-700 transition-all duration-200 font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {editingTag ? "Update" : "Add"}
                   </button>
@@ -377,7 +377,7 @@ const CategoryTagSidebar = () => {
                     <button
                       type="button"
                       onClick={handleCancelTag}
-                      className="px-4 py-2.5 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300 transition-all duration-200 font-semibold"
+                      className="px-4 py-2.5 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-all duration-200 font-semibold"
                     >
                       Cancel
                     </button>
@@ -398,7 +398,7 @@ const CategoryTagSidebar = () => {
                   {tags.map((tag) => (
                     <div
                       key={tag.id}
-                      className="inline-flex items-center space-x-2 px-4 py-2 bg-white border-2 border-gray-200 rounded-xl hover:border-purple-300 hover:shadow-md transition-all duration-200 group"
+                      className="inline-flex items-center space-x-2 px-4 py-2 bg-white border border-gray-200 rounded hover:border-purple-400 transition-all duration-200 group"
                     >
                       <span className="text-sm font-semibold text-gray-700">
                         #{tag.name}
@@ -447,8 +447,8 @@ const CategoryTagSidebar = () => {
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-12 bg-gray-50 rounded-xl">
-                  <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
+                <div className="text-center py-12 bg-gray-50 rounded border border-gray-200">
+                  <div className="w-16 h-16 bg-gray-200 rounded flex items-center justify-center mx-auto mb-4">
                     <svg
                       className="w-8 h-8 text-gray-400"
                       fill="none"

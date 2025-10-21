@@ -125,7 +125,7 @@ const Layout = ({ children }) => {
   return (
     <div className="min-h-screen flex flex-col">
       {/* Modern Navigation */}
-      <nav className="bg-white/80 backdrop-blur-lg border-b border-gray-200/60 sticky top-0 z-50 shadow-sm">
+      <nav className="bg-white border-b border-gray-200 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
@@ -133,7 +133,7 @@ const Layout = ({ children }) => {
               to="/"
               className="flex items-center space-x-3 group"
             >
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 text-white flex items-center justify-center font-bold rounded-xl shadow-lg shadow-blue-500/30 group-hover:shadow-xl group-hover:shadow-blue-500/40 transition-all duration-300 group-hover:scale-105">
+              <div className="w-10 h-10 bg-blue-600 text-white flex items-center justify-center font-bold rounded transition-all duration-200">
                 <svg
                   className="w-6 h-6"
                   fill="none"
@@ -149,7 +149,7 @@ const Layout = ({ children }) => {
                 </svg>
               </div>
               <div className="flex flex-col">
-                <span className="text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+                <span className="text-xl font-bold text-gray-900">
                   Finance Insights
                 </span>
                 <span className="text-xs text-gray-500 -mt-1">
@@ -164,9 +164,9 @@ const Layout = ({ children }) => {
                 <Link
                   key={link.path}
                   to={link.path}
-                  className={`flex items-center space-x-2 px-4 py-2 rounded-xl font-medium transition-all duration-200 ${
+                  className={`flex items-center space-x-2 px-4 py-2 rounded font-medium transition-all duration-200 ${
                     location.pathname === link.path
-                      ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/30"
+                      ? "bg-blue-600 text-white"
                       : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                   }`}
                 >
@@ -184,8 +184,8 @@ const Layout = ({ children }) => {
               {/* User Info - Desktop */}
               {!loading && user && (
                 <div className="hidden md:flex items-center space-x-3 pl-4 border-l border-gray-200">
-                  <div className="flex items-center space-x-3 px-3 py-2 rounded-xl bg-gradient-to-r from-gray-50 to-white border border-gray-200">
-                    <div className="w-9 h-9 bg-gradient-to-br from-blue-500 to-purple-600 text-white flex items-center justify-center rounded-lg font-semibold text-sm shadow-md">
+                  <div className="flex items-center space-x-3 px-3 py-2 rounded bg-gray-50 border border-gray-200">
+                    <div className="w-9 h-9 bg-blue-600 text-white flex items-center justify-center rounded font-semibold text-sm">
                       {profile?.full_name?.charAt(0).toUpperCase() ||
                         user.email?.charAt(0).toUpperCase() ||
                         "U"}
@@ -205,7 +205,7 @@ const Layout = ({ children }) => {
                   <button
                     onClick={handleLogout}
                     disabled={isLoggingOut}
-                    className="px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-xl transition-all duration-200 hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
+                    className="px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {isLoggingOut ? (
                       <div className="flex items-center space-x-2">
@@ -222,7 +222,7 @@ const Layout = ({ children }) => {
               {/* Mobile Menu Button */}
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="md:hidden p-2 rounded-xl hover:bg-gray-100 transition-all duration-200"
+                className="md:hidden p-2 rounded hover:bg-gray-100 transition-all duration-200"
               >
                 {mobileMenuOpen ? (
                   <svg
@@ -266,9 +266,9 @@ const Layout = ({ children }) => {
                     key={link.path}
                     to={link.path}
                     onClick={() => setMobileMenuOpen(false)}
-                    className={`flex items-center space-x-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 ${
+                    className={`flex items-center space-x-3 px-4 py-3 rounded font-medium transition-all duration-200 ${
                       location.pathname === link.path
-                        ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg"
+                        ? "bg-blue-600 text-white"
                         : "text-gray-600 hover:bg-gray-100"
                     }`}
                   >
@@ -280,8 +280,8 @@ const Layout = ({ children }) => {
                 {/* User Section - Mobile */}
                 {!loading && user && (
                   <div className="pt-4 mt-4 border-t border-gray-200">
-                    <div className="flex items-center space-x-3 px-4 py-3 bg-gradient-to-r from-gray-50 to-white rounded-xl mb-2">
-                      <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 text-white flex items-center justify-center rounded-lg font-semibold shadow-md">
+                    <div className="flex items-center space-x-3 px-4 py-3 bg-gray-50 rounded mb-2 border border-gray-200">
+                      <div className="w-10 h-10 bg-blue-600 text-white flex items-center justify-center rounded font-semibold">
                         {profile?.full_name?.charAt(0).toUpperCase() ||
                           user.email?.charAt(0).toUpperCase() ||
                           "U"}
@@ -303,7 +303,7 @@ const Layout = ({ children }) => {
                         setMobileMenuOpen(false);
                       }}
                       disabled={isLoggingOut}
-                      className="w-full px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 rounded-xl transition-all duration-200 disabled:opacity-50"
+                      className="w-full px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 rounded transition-all duration-200 disabled:opacity-50"
                     >
                       {isLoggingOut ? "Logging out..." : "Logout"}
                     </button>
@@ -319,13 +319,13 @@ const Layout = ({ children }) => {
       <main className="flex-1">{children}</main>
 
       {/* Modern Footer */}
-      <footer className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white mt-auto">
+      <footer className="bg-gray-900 text-white mt-auto">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Brand Section */}
             <div>
               <div className="flex items-center space-x-3 mb-4">
-                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 text-white flex items-center justify-center font-bold rounded-xl shadow-lg">
+                <div className="w-10 h-10 bg-blue-600 text-white flex items-center justify-center font-bold rounded">
                   <svg
                     className="w-6 h-6"
                     fill="none"
@@ -371,7 +371,7 @@ const Layout = ({ children }) => {
                 {["React", "Tailwind CSS", "Supabase", "Vite"].map((tech) => (
                   <span
                     key={tech}
-                    className="px-3 py-1 bg-white/10 text-gray-300 text-xs rounded-full backdrop-blur-sm"
+                    className="px-3 py-1 bg-white/10 text-gray-300 text-xs rounded border border-white/10"
                   >
                     {tech}
                   </span>

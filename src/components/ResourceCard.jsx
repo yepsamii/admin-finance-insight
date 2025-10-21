@@ -37,9 +37,9 @@ const ResourceCard = ({ resource, onEdit, onDelete, isAdmin = false }) => {
   );
 
   return (
-    <div className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 border border-gray-200 overflow-hidden group">
+    <div className="bg-white rounded border border-gray-200 hover:border-gray-300 transition-all duration-300 overflow-hidden group">
       {/* Card Header with File Icon */}
-      <div className="bg-gradient-to-br from-blue-50 to-purple-50 p-6 border-b border-gray-200">
+      <div className="bg-gray-50 p-6 border-b border-gray-200">
         <div className="flex items-start justify-between">
           <div className="flex items-center space-x-4">
             <div className="text-5xl group-hover:scale-110 transition-transform duration-300">
@@ -54,7 +54,7 @@ const ResourceCard = ({ resource, onEdit, onDelete, isAdmin = false }) => {
           </div>
 
           {!resource.published && (
-            <span className="px-3 py-1 bg-yellow-100 text-yellow-800 text-xs font-semibold rounded-full">
+            <span className="px-3 py-1 bg-yellow-100 text-yellow-800 text-xs font-semibold rounded border border-yellow-200">
               Draft
             </span>
           )}
@@ -73,7 +73,7 @@ const ResourceCard = ({ resource, onEdit, onDelete, isAdmin = false }) => {
         {/* Metadata */}
         <div className="flex flex-wrap gap-2 mb-4">
           {resource.categories && (
-            <span className="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full">
+            <span className="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded border border-blue-200">
               <svg
                 className="w-3 h-3 mr-1"
                 fill="currentColor"
@@ -88,7 +88,7 @@ const ResourceCard = ({ resource, onEdit, onDelete, isAdmin = false }) => {
           {resource.resource_tags?.map((rt) => (
             <span
               key={rt.tags.id}
-              className="inline-flex items-center px-3 py-1 bg-purple-100 text-purple-700 text-xs font-medium rounded-full"
+              className="inline-flex items-center px-3 py-1 bg-purple-100 text-purple-700 text-xs font-medium rounded border border-purple-200"
             >
               <svg
                 className="w-3 h-3 mr-1"
@@ -159,7 +159,7 @@ const ResourceCard = ({ resource, onEdit, onDelete, isAdmin = false }) => {
         <div className="flex items-center gap-2">
           <button
             onClick={handleDownload}
-            className="flex-1 flex items-center justify-center space-x-2 px-4 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-md hover:shadow-lg font-medium"
+            className="flex-1 flex items-center justify-center space-x-2 px-4 py-2.5 bg-blue-600 text-white rounded hover:bg-blue-700 transition-all duration-200 font-medium"
           >
             <svg
               className="w-4 h-4"
@@ -180,7 +180,7 @@ const ResourceCard = ({ resource, onEdit, onDelete, isAdmin = false }) => {
           {isAdmin && onEdit && (
             <button
               onClick={() => onEdit(resource)}
-              className="px-4 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-all duration-200 font-medium"
+              className="px-4 py-2.5 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-all duration-200 font-medium"
             >
               <svg
                 className="w-4 h-4"
@@ -202,7 +202,7 @@ const ResourceCard = ({ resource, onEdit, onDelete, isAdmin = false }) => {
             <button
               onClick={handleDelete}
               disabled={isDeleting}
-              className="px-4 py-2.5 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-all duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-4 py-2.5 bg-red-100 text-red-600 rounded hover:bg-red-200 transition-all duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isDeleting ? (
                 <div className="w-4 h-4 border-2 border-red-600 border-t-transparent rounded-full animate-spin" />

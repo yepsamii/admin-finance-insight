@@ -329,13 +329,13 @@ const PostForm = ({ post = null, onSubmit, onCancel, isLoading = false }) => {
           <label className="block text-sm font-semibold text-gray-900">
             Cover Image
           </label>
-          <div className="flex items-center space-x-2 bg-gray-100 rounded-lg p-1">
+          <div className="flex items-center space-x-2 bg-gray-100 rounded p-1">
             <button
               type="button"
               onClick={() => setImageInputMode("url")}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all duration-200 ${
+              className={`px-3 py-1.5 text-xs font-semibold rounded transition-all duration-200 ${
                 imageInputMode === "url"
-                  ? "bg-white text-blue-600 shadow-sm"
+                  ? "bg-white text-blue-600"
                   : "text-gray-600 hover:text-gray-900"
               }`}
             >
@@ -344,9 +344,9 @@ const PostForm = ({ post = null, onSubmit, onCancel, isLoading = false }) => {
             <button
               type="button"
               onClick={() => setImageInputMode("upload")}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all duration-200 ${
+              className={`px-3 py-1.5 text-xs font-semibold rounded transition-all duration-200 ${
                 imageInputMode === "upload"
-                  ? "bg-white text-blue-600 shadow-sm"
+                  ? "bg-white text-blue-600"
                   : "text-gray-600 hover:text-gray-900"
               }`}
             >
@@ -387,7 +387,7 @@ const PostForm = ({ post = null, onSubmit, onCancel, isLoading = false }) => {
             <div className="flex items-center justify-center w-full">
               <label
                 htmlFor="image_file"
-                className={`flex flex-col items-center justify-center w-full h-40 border-2 border-dashed rounded-xl cursor-pointer transition-all duration-200 ${
+                className={`flex flex-col items-center justify-center w-full h-40 border-2 border-dashed rounded cursor-pointer transition-all duration-200 ${
                   uploadingImage
                     ? "border-blue-400 bg-blue-50"
                     : "border-gray-300 bg-gray-50 hover:bg-gray-100 hover:border-gray-400"
@@ -467,7 +467,7 @@ const PostForm = ({ post = null, onSubmit, onCancel, isLoading = false }) => {
         )}
 
         {formData.header_image_url && (
-          <div className="mt-4 relative rounded-xl overflow-hidden border-2 border-gray-200 group">
+          <div className="mt-4 relative rounded overflow-hidden border-2 border-gray-200 group">
             <img
               src={formData.header_image_url}
               alt="Preview"
@@ -480,7 +480,7 @@ const PostForm = ({ post = null, onSubmit, onCancel, isLoading = false }) => {
             <button
               type="button"
               onClick={handleRemoveImage}
-              className="absolute top-3 right-3 p-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all duration-200 opacity-0 group-hover:opacity-100 shadow-lg"
+              className="absolute top-3 right-3 p-2 bg-red-600 text-white rounded hover:bg-red-700 transition-all duration-200 opacity-0 group-hover:opacity-100"
             >
               <svg
                 className="w-5 h-5"
@@ -552,14 +552,14 @@ const PostForm = ({ post = null, onSubmit, onCancel, isLoading = false }) => {
             ({formData.tags.length} selected)
           </span>
         </label>
-        <div className="bg-gray-50 border-2 border-gray-200 rounded-xl p-4 max-h-40 overflow-y-auto">
+        <div className="bg-gray-50 border border-gray-200 rounded p-4 max-h-40 overflow-y-auto">
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
             {tags.map((tag) => (
               <label
                 key={tag.id}
-                className={`flex items-center space-x-2 p-2 rounded-lg cursor-pointer transition-all duration-200 ${
+                className={`flex items-center space-x-2 p-2 rounded cursor-pointer transition-all duration-200 ${
                   formData.tags.includes(tag.id)
-                    ? "bg-blue-100 ring-2 ring-blue-500"
+                    ? "bg-blue-100 border border-blue-300"
                     : "hover:bg-gray-100"
                 }`}
               >
@@ -593,8 +593,8 @@ const PostForm = ({ post = null, onSubmit, onCancel, isLoading = false }) => {
           Article Content *
         </label>
         <div
-          className={`border-2 rounded-xl overflow-hidden ${
-            errors.content ? "border-red-500" : "border-gray-200"
+          className={`border rounded overflow-hidden ${
+            errors.content ? "border-red-500" : "border-gray-300"
           }`}
         >
           <BlockNoteView
@@ -622,7 +622,7 @@ const PostForm = ({ post = null, onSubmit, onCancel, isLoading = false }) => {
       </div>
 
       {/* Published */}
-      <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-6 border-2 border-blue-100">
+      <div className="bg-blue-50 rounded p-6 border border-blue-200">
         <div className="flex items-start space-x-3">
           <input
             type="checkbox"
@@ -649,18 +649,18 @@ const PostForm = ({ post = null, onSubmit, onCancel, isLoading = false }) => {
       </div>
 
       {/* Actions */}
-      <div className="flex items-center justify-end space-x-4 pt-8 border-t-2 border-gray-200">
+      <div className="flex items-center justify-end space-x-4 pt-8 border-t border-gray-200">
         <button
           type="button"
           onClick={onCancel}
-          className="px-6 py-3 text-sm font-semibold text-gray-700 bg-white border-2 border-gray-300 rounded-xl hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 active:scale-95"
+          className="px-6 py-3 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 hover:border-gray-400 transition-all duration-200"
         >
           Cancel
         </button>
         <button
           type="submit"
           disabled={isLoading}
-          className="inline-flex items-center px-8 py-3 text-sm font-semibold text-white bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
+          className="inline-flex items-center px-8 py-3 text-sm font-semibold text-white bg-blue-600 rounded hover:bg-blue-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isLoading ? (
             <>
