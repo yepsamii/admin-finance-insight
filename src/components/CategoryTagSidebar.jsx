@@ -141,18 +141,18 @@ const CategoryTagSidebar = () => {
   return (
     <div className="w-full bg-white overflow-hidden flex flex-col h-full">
       {/* Header */}
-      <div className="bg-blue-600 px-6 py-5 flex-shrink-0">
+      <div className="bg-navy-800 px-6 py-5 flex-shrink-0">
         <h2 className="text-xl font-bold text-white">Manage Content</h2>
-        <p className="text-blue-100 text-sm mt-1">Categories & Tags</p>
+        <p className="text-white/80 text-sm mt-1">Categories & Tags</p>
       </div>
 
       {/* Tabs */}
       <div className="flex border-b border-gray-200 px-6 flex-shrink-0">
         <button
           onClick={() => setActiveTab("categories")}
-          className={`px-4 py-3 font-semibold text-sm transition-all duration-200 border-b-2 ${
+          className={`px-4 py-3 font-semibold text-sm transition-colors border-b-2 ${
             activeTab === "categories"
-              ? "border-blue-600 text-blue-600"
+              ? "border-navy-600 text-navy-600"
               : "border-transparent text-gray-600 hover:text-gray-900"
           }`}
         >
@@ -160,9 +160,9 @@ const CategoryTagSidebar = () => {
         </button>
         <button
           onClick={() => setActiveTab("tags")}
-          className={`px-4 py-3 font-semibold text-sm transition-all duration-200 border-b-2 ${
+          className={`px-4 py-3 font-semibold text-sm transition-colors border-b-2 ${
             activeTab === "tags"
-              ? "border-purple-600 text-purple-600"
+              ? "border-navy-600 text-navy-600"
               : "border-transparent text-gray-600 hover:text-gray-900"
           }`}
         >
@@ -176,7 +176,7 @@ const CategoryTagSidebar = () => {
         {activeTab === "categories" && (
           <div className="space-y-6">
             {/* Form */}
-            <div className="bg-blue-50 rounded p-6 border border-blue-100">
+            <div className="bg-gray-50 rounded-lg p-5 border border-gray-200">
               <h3 className="text-lg font-bold text-gray-900 mb-4">
                 {editingCategory ? "Edit Category" : "Add New Category"}
               </h3>
@@ -194,7 +194,7 @@ const CategoryTagSidebar = () => {
                     onChange={(e) =>
                       setCategoryForm({ ...categoryForm, name: e.target.value })
                     }
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                    className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-navy-500 focus:border-navy-500 transition-colors"
                     placeholder="e.g., Finance"
                     required
                   />
@@ -212,18 +212,18 @@ const CategoryTagSidebar = () => {
                       })
                     }
                     rows={3}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 resize-none"
+                    className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-navy-500 focus:border-navy-500 transition-colors resize-none"
                     placeholder="Brief description (optional)"
                   />
                 </div>
-                <div className="flex space-x-3">
+                <div className="flex space-x-2">
                   <button
                     type="submit"
                     disabled={
                       createCategoryMutation.isPending ||
                       updateCategoryMutation.isPending
                     }
-                    className="flex-1 px-4 py-2.5 bg-blue-600 text-white rounded hover:bg-blue-700 transition-all duration-200 font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex-1 px-4 py-2 bg-navy-800 text-white rounded hover:bg-navy-900 transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {editingCategory ? "Update" : "Add"}
                   </button>
@@ -231,7 +231,7 @@ const CategoryTagSidebar = () => {
                     <button
                       type="button"
                       onClick={handleCancelCategory}
-                      className="px-4 py-2.5 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-all duration-200 font-semibold"
+                      className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-colors font-semibold"
                     >
                       Cancel
                     </button>
@@ -247,14 +247,14 @@ const CategoryTagSidebar = () => {
               </h3>
               {categoriesLoading ? (
                 <div className="flex justify-center py-12">
-                  <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                  <div className="w-10 h-10 border-4 border-navy-600 border-t-transparent rounded-full animate-spin"></div>
                 </div>
               ) : categories && categories.length > 0 ? (
-                <div className="space-y-3">
+                <div className="space-y-2">
                   {categories.map((category) => (
                     <div
                       key={category.id}
-                      className="bg-white border border-gray-200 rounded p-4 hover:border-blue-400 transition-all duration-200 group"
+                      className="bg-white border border-gray-200 rounded-lg p-3 hover:border-gray-300 hover:shadow-sm transition-all"
                     >
                       <div className="flex items-start justify-between">
                         <div className="flex-1 min-w-0">
@@ -267,10 +267,10 @@ const CategoryTagSidebar = () => {
                             </p>
                           )}
                         </div>
-                        <div className="flex items-center space-x-1 ml-3">
+                        <div className="flex items-center space-x-1 ml-2">
                           <button
                             onClick={() => handleEditCategory(category)}
-                            className="p-2 text-blue-600 hover:bg-blue-100 rounded transition-all duration-200"
+                            className="p-1.5 text-navy-600 hover:bg-gray-100 rounded transition-colors"
                             title="Edit"
                           >
                             <svg
@@ -289,7 +289,7 @@ const CategoryTagSidebar = () => {
                           </button>
                           <button
                             onClick={() => handleDeleteCategory(category.id)}
-                            className="p-2 text-red-600 hover:bg-red-100 rounded transition-all duration-200"
+                            className="p-1.5 text-red-600 hover:bg-red-50 rounded transition-colors"
                             title="Delete"
                           >
                             <svg
@@ -312,10 +312,10 @@ const CategoryTagSidebar = () => {
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-12 bg-gray-50 rounded-xl">
-                  <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
+                <div className="text-center py-10 bg-gray-50 rounded-lg border border-gray-200">
+                  <div className="w-14 h-14 bg-navy-600 rounded-full flex items-center justify-center mx-auto mb-4">
                     <svg
-                      className="w-8 h-8 text-gray-400"
+                      className="w-7 h-7 text-white"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -328,8 +328,10 @@ const CategoryTagSidebar = () => {
                       />
                     </svg>
                   </div>
-                  <p className="text-gray-500 font-medium">No categories yet</p>
-                  <p className="text-sm text-gray-400 mt-1">
+                  <p className="text-gray-700 font-semibold">
+                    No categories yet
+                  </p>
+                  <p className="text-sm text-gray-500 mt-1">
                     Create your first category above
                   </p>
                 </div>
@@ -342,7 +344,7 @@ const CategoryTagSidebar = () => {
         {activeTab === "tags" && (
           <div className="space-y-6">
             {/* Form */}
-            <div className="bg-purple-50 rounded p-6 border border-purple-100">
+            <div className="bg-gray-50 rounded-lg p-5 border border-gray-200">
               <h3 className="text-lg font-bold text-gray-900 mb-4">
                 {editingTag ? "Edit Tag" : "Add New Tag"}
               </h3>
@@ -358,18 +360,18 @@ const CategoryTagSidebar = () => {
                     type="text"
                     value={tagForm.name}
                     onChange={(e) => setTagForm({ name: e.target.value })}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200"
+                    className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-navy-500 focus:border-navy-500 transition-colors"
                     placeholder="e.g., Tax Planning"
                     required
                   />
                 </div>
-                <div className="flex space-x-3">
+                <div className="flex space-x-2">
                   <button
                     type="submit"
                     disabled={
                       createTagMutation.isPending || updateTagMutation.isPending
                     }
-                    className="flex-1 px-4 py-2.5 bg-purple-600 text-white rounded hover:bg-purple-700 transition-all duration-200 font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex-1 px-4 py-2 bg-navy-800 text-white rounded hover:bg-navy-900 transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {editingTag ? "Update" : "Add"}
                   </button>
@@ -377,7 +379,7 @@ const CategoryTagSidebar = () => {
                     <button
                       type="button"
                       onClick={handleCancelTag}
-                      className="px-4 py-2.5 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-all duration-200 font-semibold"
+                      className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-colors font-semibold"
                     >
                       Cancel
                     </button>
@@ -391,22 +393,22 @@ const CategoryTagSidebar = () => {
               <h3 className="text-lg font-bold text-gray-900 mb-4">All Tags</h3>
               {tagsLoading ? (
                 <div className="flex justify-center py-12">
-                  <div className="w-10 h-10 border-4 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
+                  <div className="w-10 h-10 border-4 border-navy-600 border-t-transparent rounded-full animate-spin"></div>
                 </div>
               ) : tags && tags.length > 0 ? (
                 <div className="flex flex-wrap gap-2">
                   {tags.map((tag) => (
                     <div
                       key={tag.id}
-                      className="inline-flex items-center space-x-2 px-4 py-2 bg-white border border-gray-200 rounded hover:border-purple-400 transition-all duration-200 group"
+                      className="inline-flex items-center space-x-2 px-3 py-1.5 bg-white border border-gray-200 rounded hover:border-gray-300 hover:shadow-sm transition-all"
                     >
                       <span className="text-sm font-semibold text-gray-700">
                         #{tag.name}
                       </span>
-                      <div className="flex items-center space-x-1">
+                      <div className="flex items-center space-x-0.5">
                         <button
                           onClick={() => handleEditTag(tag)}
-                          className="p-1 text-blue-600 hover:bg-blue-100 rounded transition-all duration-200"
+                          className="p-1 text-navy-600 hover:bg-gray-100 rounded transition-colors"
                           title="Edit"
                         >
                           <svg
@@ -425,7 +427,7 @@ const CategoryTagSidebar = () => {
                         </button>
                         <button
                           onClick={() => handleDeleteTag(tag.id)}
-                          className="p-1 text-red-600 hover:bg-red-100 rounded transition-all duration-200"
+                          className="p-1 text-red-600 hover:bg-red-50 rounded transition-colors"
                           title="Delete"
                         >
                           <svg
@@ -447,10 +449,10 @@ const CategoryTagSidebar = () => {
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-12 bg-gray-50 rounded border border-gray-200">
-                  <div className="w-16 h-16 bg-gray-200 rounded flex items-center justify-center mx-auto mb-4">
+                <div className="text-center py-10 bg-gray-50 rounded-lg border border-gray-200">
+                  <div className="w-14 h-14 bg-navy-600 rounded-full flex items-center justify-center mx-auto mb-4">
                     <svg
-                      className="w-8 h-8 text-gray-400"
+                      className="w-7 h-7 text-white"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -463,8 +465,8 @@ const CategoryTagSidebar = () => {
                       />
                     </svg>
                   </div>
-                  <p className="text-gray-500 font-medium">No tags yet</p>
-                  <p className="text-sm text-gray-400 mt-1">
+                  <p className="text-gray-700 font-semibold">No tags yet</p>
+                  <p className="text-sm text-gray-500 mt-1">
                     Create your first tag above
                   </p>
                 </div>

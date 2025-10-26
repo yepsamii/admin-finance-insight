@@ -621,33 +621,6 @@ const PostForm = ({ post = null, onSubmit, onCancel, isLoading = false }) => {
         )}
       </div>
 
-      {/* Published */}
-      <div className="bg-blue-50 rounded p-6 border border-blue-200">
-        <div className="flex items-start space-x-3">
-          <input
-            type="checkbox"
-            id="published"
-            name="published"
-            checked={formData.published}
-            onChange={handleChange}
-            className="mt-1 rounded border-gray-300 text-blue-600 focus:ring-blue-500 w-5 h-5"
-          />
-          <div className="flex-1">
-            <label
-              htmlFor="published"
-              className="block text-base font-semibold text-gray-900 mb-1 cursor-pointer"
-            >
-              Publish this article
-            </label>
-            <p className="text-sm text-gray-600">
-              {formData.published
-                ? "This article will be visible to all visitors on the blog."
-                : "This article will be saved as a draft and won't be publicly visible."}
-            </p>
-          </div>
-        </div>
-      </div>
-
       {/* Actions */}
       <div className="flex items-center justify-end space-x-4 pt-8 border-t border-gray-200">
         <button

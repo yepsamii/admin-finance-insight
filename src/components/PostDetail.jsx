@@ -79,201 +79,177 @@ const PostDetail = ({ post }) => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <article className="max-w-4xl mx-auto px-4 py-12">
-        {/* Header Image */}
-        {post.header_image_url && (
-          <div className="relative aspect-video w-full mb-10 overflow-hidden rounded border border-gray-200">
-            <img
-              src={post.header_image_url}
-              alt={post.title}
-              className="w-full h-full object-cover"
-            />
-            {/* Gradient Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
-          </div>
-        )}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="flex flex-col lg:flex-row gap-8">
+          {/* Sidebar - Left */}
+          <aside className="lg:w-80 flex-shrink-0 order-2 lg:order-1">
+            <div className="lg:sticky lg:top-20 space-y-6">
+              {/* Recent Posts */}
+              <div className="bg-white rounded-lg border border-gray-200 p-6">
+                <h3 className="text-lg font-bold text-gray-900 mb-4">
+                  Recent Posts
+                </h3>
+                <div className="space-y-4">
+                  {/* Mock recent posts - you'd fetch these from API */}
+                  {[1, 2, 3].map((i) => (
+                    <div
+                      key={i}
+                      className="flex items-start space-x-3"
+                    >
+                      <div className="w-16 h-16 bg-gray-200 rounded flex-shrink-0"></div>
+                      <div className="flex-1 min-w-0">
+                        <Link
+                          to="/"
+                          className="text-sm font-semibold text-gray-900 hover:text-blue-600 line-clamp-2 mb-1"
+                        >
+                          The Future of Cryptocurrency in Traditional Banking
+                        </Link>
+                        <p className="text-xs text-gray-500">July 16, 2025</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
 
-        {/* Category & Meta Bar */}
-        <div className="flex flex-wrap items-center gap-4 mb-6">
-          {post.categories && (
-            <Link
-              to={`/category/${post.categories.slug}`}
-              className="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded hover:bg-blue-700 transition-all duration-200"
-            >
-              <svg
-                className="w-4 h-4 mr-1.5"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M17.707 9.293a1 1 0 010 1.414l-7 7a1 1 0 01-1.414 0l-7-7A.997.997 0 012 10V5a3 3 0 013-3h5c.256 0 .512.098.707.293l7 7zM5 6a1 1 0 100-2 1 1 0 000 2z"
-                  clipRule="evenodd"
+              {/* Categories */}
+              {post.categories && (
+                <div className="bg-white rounded-lg border border-gray-200 p-6">
+                  <h3 className="text-lg font-bold text-gray-900 mb-4">
+                    Categories
+                  </h3>
+                  <div className="space-y-2">
+                    <Link
+                      to="/"
+                      className="flex items-center text-sm text-gray-700 hover:text-blue-600"
+                    >
+                      <span className="flex-1">Finance</span>
+                      <span className="text-gray-400">8</span>
+                    </Link>
+                    <Link
+                      to="/"
+                      className="flex items-center text-sm text-gray-700 hover:text-blue-600"
+                    >
+                      <span className="flex-1">Tax</span>
+                      <span className="text-gray-400">4</span>
+                    </Link>
+                    <Link
+                      to="/"
+                      className="flex items-center text-sm text-gray-700 hover:text-blue-600"
+                    >
+                      <span className="flex-1">Economics</span>
+                      <span className="text-gray-400">5</span>
+                    </Link>
+                    <Link
+                      to="/"
+                      className="flex items-center text-sm text-gray-700 hover:text-blue-600"
+                    >
+                      <span className="flex-1">Auditing</span>
+                      <span className="text-gray-400">2</span>
+                    </Link>
+                    <Link
+                      to="/"
+                      className="flex items-center text-sm text-gray-700 hover:text-blue-600"
+                    >
+                      <span className="flex-1">Accounting</span>
+                      <span className="text-gray-400">4</span>
+                    </Link>
+                    <Link
+                      to="/"
+                      className="flex items-center text-sm text-gray-700 hover:text-blue-600"
+                    >
+                      <span className="flex-1">Industry Analysis</span>
+                      <span className="text-gray-400">3</span>
+                    </Link>
+                  </div>
+                </div>
+              )}
+
+              {/* Popular Tags */}
+              {post.post_tags && post.post_tags.length > 0 && (
+                <div className="bg-white rounded-lg border border-gray-200 p-6">
+                  <h3 className="text-lg font-bold text-gray-900 mb-4">
+                    Popular Tags
+                  </h3>
+                  <div className="flex flex-wrap gap-2">
+                    {[
+                      "Tax Planning",
+                      "Audit",
+                      "Compliance",
+                      "Money",
+                      "Investing",
+                      "Stocks",
+                      "Market Trends",
+                      "Inflation",
+                      "Bonds",
+                    ].map((tag) => (
+                      <Link
+                        key={tag}
+                        to="/"
+                        className="px-3 py-1 bg-gray-100 text-gray-700 text-xs rounded hover:bg-gray-200 transition-colors"
+                      >
+                        {tag}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </aside>
+
+          {/* Main Content */}
+          <article className="flex-1 order-1 lg:order-2 bg-white rounded-lg border border-gray-200 p-8">
+            {/* Header Image */}
+            {post.header_image_url && (
+              <div className="relative aspect-video w-full mb-8 overflow-hidden rounded">
+                <img
+                  src={post.header_image_url}
+                  alt={post.title}
+                  className="w-full h-full object-cover"
                 />
-              </svg>
-              {post.categories.name}
-            </Link>
-          )}
+              </div>
+            )}
 
-          {!post.published && (
-            <span className="inline-flex items-center px-4 py-2 bg-yellow-100 text-yellow-800 text-sm font-semibold rounded border border-yellow-200">
-              <svg
-                className="w-4 h-4 mr-1.5"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              Draft
-            </span>
-          )}
-        </div>
-
-        {/* Title */}
-        <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-          {post.title}
-        </h1>
-
-        {/* Meta Information */}
-        <div className="flex flex-wrap items-center gap-6 text-gray-600 mb-8 pb-8 border-b border-gray-200">
-          <div className="flex items-center space-x-2">
-            <svg
-              className="w-5 h-5 text-blue-600"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-              />
-            </svg>
-            <span className="font-medium">
-              {formatDate(post.published_at || post.created_at)}
-            </span>
-          </div>
-
-          <div className="flex items-center space-x-2">
-            <svg
-              className="w-5 h-5 text-purple-600"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-            <span className="font-medium">
-              {calculateReadingTime(post.content)} min read
-            </span>
-          </div>
-
-          <button className="flex items-center space-x-2 text-blue-600 hover:text-blue-700 font-medium">
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"
-              />
-            </svg>
-            <span>Share</span>
-          </button>
-        </div>
-
-        {/* Description */}
-        {post.description && (
-          <div className="mb-10 p-6 bg-blue-50 rounded border-l-4 border-blue-600">
-            <p className="text-xl text-gray-700 leading-relaxed font-medium">
-              {post.description}
-            </p>
-          </div>
-        )}
-
-        {/* Tags */}
-        {post.post_tags && post.post_tags.length > 0 && (
-          <div className="mb-10">
-            <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">
-              Topics Covered
-            </h3>
-            <div className="flex flex-wrap gap-2">
-              {post.post_tags.map((postTag) => (
-                <span
-                  key={postTag.tags.id}
-                  className="inline-flex items-center px-4 py-2 bg-white text-gray-700 text-sm font-medium rounded border border-gray-200 hover:border-blue-300 transition-all duration-200"
-                >
-                  <svg
-                    className="w-3.5 h-3.5 mr-2 text-blue-500"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M17.707 9.293a1 1 0 010 1.414l-7 7a1 1 0 01-1.414 0l-7-7A.997.997 0 012 10V5a3 3 0 013-3h5c.256 0 .512.098.707.293l7 7zM5 6a1 1 0 100-2 1 1 0 000 2z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                  {postTag.tags.name}
+            {/* Category & Meta Bar */}
+            <div className="mb-4">
+              {post.categories && (
+                <span className="inline-block text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                  {post.categories.name}
                 </span>
-              ))}
+              )}
             </div>
-          </div>
-        )}
 
-        {/* Content */}
-        <div className="blog-content prose prose-lg max-w-none mb-12">
-          <BlockNoteView
-            editor={editor}
-            theme="light"
-            editable={false}
-          />
-        </div>
+            {/* Title */}
+            <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 leading-tight">
+              {post.title}
+            </h1>
 
-        {/* Bottom Navigation & CTA */}
-        <div className="mt-16 pt-8 border-t border-gray-200">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <Link
-              to="/"
-              className="inline-flex items-center px-6 py-3 text-blue-600 hover:text-blue-700 font-semibold hover:bg-blue-50 rounded transition-all duration-200"
-            >
-              <svg
-                className="w-5 h-5 mr-2"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M15 19l-7-7 7-7"
-                />
-              </svg>
-              Back to all articles
-            </Link>
+            {/* Subtitle/Description */}
+            {post.description && (
+              <p className="text-lg text-gray-600 italic mb-6">
+                Stay Ahead of New Regulations
+              </p>
+            )}
 
-            <div className="flex items-center space-x-4">
-              <button
-                className="p-3 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded transition-all duration-200"
-                title="Like"
-              >
+            {/* Meta Information */}
+            <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500 mb-8 pb-6 border-b border-gray-200">
+              <div className="flex items-center">
                 <svg
-                  className="w-6 h-6"
+                  className="w-4 h-4 mr-1.5"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                <span>Tax</span>
+              </div>
+
+              <div className="flex items-center">
+                <svg
+                  className="w-4 h-4 mr-1.5"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -282,32 +258,94 @@ const PostDetail = ({ post }) => {
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth={2}
-                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
                   />
                 </svg>
-              </button>
-              <button
-                className="p-3 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded transition-all duration-200"
-                title="Bookmark"
-              >
-                <svg
-                  className="w-6 h-6"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"
-                  />
-                </svg>
-              </button>
+                <span>{formatDate(post.published_at || post.created_at)}</span>
+              </div>
+
+              <div className="flex items-center">
+                <span>
+                  Updated on {formatDate(post.updated_at || post.created_at)}
+                </span>
+              </div>
             </div>
-          </div>
+
+            {/* Content */}
+            <div className="blog-content prose prose-lg max-w-none mb-12">
+              <BlockNoteView
+                editor={editor}
+                theme="light"
+                editable={false}
+              />
+            </div>
+
+            {/* Share This Article */}
+            <div className="mt-12 pt-6 border-t border-gray-200">
+              <h3 className="text-lg font-bold text-gray-900 mb-4">
+                Share This Article
+              </h3>
+              <div className="flex items-center space-x-3">
+                <button className="p-2 bg-gray-900 text-white rounded hover:bg-gray-800 transition-colors">
+                  <svg
+                    className="w-5 h-5"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                  </svg>
+                </button>
+                <button className="p-2 bg-gray-900 text-white rounded hover:bg-gray-800 transition-colors">
+                  <svg
+                    className="w-5 h-5"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+                  </svg>
+                </button>
+                <button className="p-2 bg-gray-900 text-white rounded hover:bg-gray-800 transition-colors">
+                  <svg
+                    className="w-5 h-5"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            {/* Related Posts */}
+            <div className="mt-12 pt-6 border-t border-gray-200">
+              <h3 className="text-xl font-bold text-gray-900 mb-6">
+                Related Posts
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {/* Mock related posts */}
+                {[1, 2, 3].map((i) => (
+                  <Link
+                    key={i}
+                    to="/"
+                    className="group"
+                  >
+                    <div className="aspect-video bg-gray-200 rounded mb-3 overflow-hidden">
+                      <div className="w-full h-full group-hover:scale-110 transition-transform duration-300"></div>
+                    </div>
+                    <span className="text-xs font-semibold text-gray-500 uppercase mb-2 block">
+                      Share Market
+                    </span>
+                    <h4 className="font-bold text-gray-900 group-hover:text-blue-600 line-clamp-2">
+                      Navigating the 2025 Share Market: Top Stocks to Watch
+                    </h4>
+                    <p className="text-xs text-gray-500 mt-2">July 7, 2025</p>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </article>
         </div>
-      </article>
+      </div>
     </div>
   );
 };

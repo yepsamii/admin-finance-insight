@@ -356,24 +356,6 @@ const ResourceForm = ({ resource, onSubmit, onCancel }) => {
         </div>
       )}
 
-      {/* Published Toggle */}
-      <div className="flex items-center space-x-3 p-4 bg-gray-50 rounded border border-gray-200">
-        <input
-          type="checkbox"
-          id="published"
-          name="published"
-          checked={formData.published}
-          onChange={handleChange}
-          className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500 cursor-pointer"
-        />
-        <label
-          htmlFor="published"
-          className="text-sm font-medium text-gray-700 cursor-pointer"
-        >
-          Publish this resource (make it visible to everyone)
-        </label>
-      </div>
-
       {/* Action Buttons */}
       <div className="flex items-center gap-3 pt-4 border-t border-gray-200">
         <button

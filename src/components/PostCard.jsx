@@ -1,14 +1,50 @@
 import { Link } from "react-router-dom";
+import { useState } from "react";
 import { formatDate } from "../utils/dateFormatter";
 import { truncateText } from "../utils/textHelpers";
+import { postsApi } from "../services/blogApi";
 
-const PostCard = ({ post, showActions = false, onEdit, onDelete }) => {
+const PostCard = ({
+  post,
+  showActions = false,
+  onEdit,
+  onDelete,
+  onPublishToggle,
+}) => {
+  const [isTogglingPublish, setIsTogglingPublish] = useState(false);
+  const [currentPublishedState, setCurrentPublishedState] = useState(
+    post.published
+  );
+
+  const handlePublishToggle = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    setIsTogglingPublish(true);
+    try {
+      await postsApi.updatePost(post.id, {
+        ...post,
+        published: !currentPublishedState,
+      });
+      setCurrentPublishedState(!currentPublishedState);
+      // Notify parent component if callback provided
+      if (onPublishToggle) {
+        onPublishToggle(post.id, !currentPublishedState);
+      }
+    } catch (error) {
+      console.error("Error toggling publish status:", error);
+      alert("Failed to update publish status");
+    } finally {
+      setIsTogglingPublish(false);
+    }
+  };
+
   return (
-    <article className="group bg-white rounded overflow-hidden transition-all duration-300 border border-gray-200 hover:border-gray-300">
+    <article className="group bg-white rounded-lg overflow-hidden transition-shadow duration-200 shadow-sm hover:shadow-md border border-gray-200">
       {/* Header Image */}
       <Link
         to={`/post/${post.slug}`}
-        className="block relative overflow-hidden aspect-video bg-gradient-to-br from-gray-100 to-gray-200"
+        className="block relative overflow-hidden aspect-video bg-gray-100"
       >
         {post.header_image_url ? (
           <>
@@ -40,30 +76,19 @@ const PostCard = ({ post, showActions = false, onEdit, onDelete }) => {
 
         {/* Category Badge - Floating */}
         {post.categories && (
-          <div className="absolute top-4 left-4">
-            <span className="inline-flex items-center px-3 py-1.5 bg-white text-blue-700 text-xs font-semibold rounded border border-blue-200">
-              <svg
-                className="w-3 h-3 mr-1.5"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M17.707 9.293a1 1 0 010 1.414l-7 7a1 1 0 01-1.414 0l-7-7A.997.997 0 012 10V5a3 3 0 013-3h5c.256 0 .512.098.707.293l7 7zM5 6a1 1 0 100-2 1 1 0 000 2z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              {post.categories.name}
+          <div className="absolute top-3 left-3">
+            <span className="inline-block px-2 py-1 bg-gray-900/80 backdrop-blur text-white text-xs font-medium rounded">
+              {post.categories.name.toUpperCase()}
             </span>
           </div>
         )}
 
         {/* Draft Badge */}
-        {!post.published && (
-          <div className="absolute top-4 right-4">
-            <span className="inline-flex items-center px-3 py-1.5 bg-yellow-100 text-yellow-800 text-xs font-semibold rounded border border-yellow-200">
+        {!currentPublishedState && (
+          <div className="absolute top-3 right-3">
+            <span className="inline-flex items-center px-2.5 py-1 bg-yellow-100 text-yellow-800 text-xs font-semibold rounded border border-yellow-200">
               <svg
-                className="w-3 h-3 mr-1.5"
+                className="w-3 h-3 mr-1"
                 fill="currentColor"
                 viewBox="0 0 20 20"
               >
@@ -79,12 +104,21 @@ const PostCard = ({ post, showActions = false, onEdit, onDelete }) => {
         )}
       </Link>
 
-      <div className="p-6">
+      <div className="p-5">
+        {/* Category Badge - Inside Card */}
+        {post.categories && (
+          <div className="mb-2">
+            <span className="inline-block text-xs font-semibold text-gray-500 uppercase tracking-wide">
+              {post.categories.name}
+            </span>
+          </div>
+        )}
+
         {/* Title */}
-        <h2 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2 leading-tight">
+        <h2 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2 leading-snug">
           <Link
             to={`/post/${post.slug}`}
-            className="hover:text-blue-600 transition-colors duration-200"
+            className="hover:text-navy-700 transition-colors"
           >
             {post.title}
           </Link>
@@ -92,74 +126,81 @@ const PostCard = ({ post, showActions = false, onEdit, onDelete }) => {
 
         {/* Description */}
         {post.description && (
-          <p className="text-gray-600 mb-4 line-clamp-3 leading-relaxed">
-            {truncateText(post.description)}
+          <p className="text-gray-600 text-sm mb-4 line-clamp-2 leading-relaxed">
+            {truncateText(post.description, 120)}
           </p>
         )}
 
-        {/* Tags */}
-        {post.post_tags && post.post_tags.length > 0 && (
-          <div className="flex flex-wrap gap-2 mb-4">
-            {post.post_tags.slice(0, 3).map((postTag) => (
-              <span
-                key={postTag.tags.id}
-                className="inline-flex items-center px-2.5 py-1 bg-gray-100 text-gray-700 text-xs font-medium rounded border border-gray-200"
-              >
-                <svg
-                  className="w-3 h-3 mr-1 text-gray-400"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M17.707 9.293a1 1 0 010 1.414l-7 7a1 1 0 01-1.414 0l-7-7A.997.997 0 012 10V5a3 3 0 013-3h5c.256 0 .512.098.707.293l7 7zM5 6a1 1 0 100-2 1 1 0 000 2z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-                {postTag.tags.name}
-              </span>
-            ))}
-            {post.post_tags.length > 3 && (
-              <span className="inline-flex items-center px-2.5 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded border border-blue-100">
-                +{post.post_tags.length - 3} more
-              </span>
-            )}
-          </div>
-        )}
-
         {/* Footer - Meta & Actions */}
-        <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-          <div className="flex items-center space-x-2 text-sm text-gray-500">
-            <svg
-              className="w-4 h-4"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-              />
-            </svg>
-            <span className="font-medium">
-              {formatDate(post.published_at || post.created_at)}
-            </span>
+        <div className="flex items-center justify-between pt-3 border-t border-gray-100 mt-3">
+          <div className="flex items-center space-x-1 text-xs text-gray-500">
+            <span>{formatDate(post.published_at || post.created_at)}</span>
           </div>
 
           {showActions ? (
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-1">
+              <button
+                onClick={handlePublishToggle}
+                disabled={isTogglingPublish}
+                className={`p-2 rounded transition-colors ${
+                  currentPublishedState
+                    ? "text-green-600 hover:bg-green-50"
+                    : "text-gray-600 hover:bg-gray-100"
+                } disabled:opacity-50 disabled:cursor-not-allowed`}
+                title={
+                  currentPublishedState
+                    ? "Published - Click to unpublish"
+                    : "Draft - Click to publish"
+                }
+              >
+                {isTogglingPublish ? (
+                  <div className="w-4 h-4 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin"></div>
+                ) : currentPublishedState ? (
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                    />
+                  </svg>
+                ) : (
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"
+                    />
+                  </svg>
+                )}
+              </button>
               <button
                 onClick={(e) => {
                   e.preventDefault();
                   onEdit(post);
                 }}
-                className="p-2 text-blue-600 hover:bg-blue-50 rounded transition-all duration-200"
+                className="p-2 text-navy-600 hover:bg-gray-100 rounded transition-colors"
                 title="Edit post"
               >
                 <svg
-                  className="w-5 h-5"
+                  className="w-4 h-4"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -177,11 +218,11 @@ const PostCard = ({ post, showActions = false, onEdit, onDelete }) => {
                   e.preventDefault();
                   onDelete(post);
                 }}
-                className="p-2 text-red-600 hover:bg-red-50 rounded transition-all duration-200"
+                className="p-2 text-red-600 hover:bg-red-50 rounded transition-colors"
                 title="Delete post"
               >
                 <svg
-                  className="w-5 h-5"
+                  className="w-4 h-4"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -198,22 +239,9 @@ const PostCard = ({ post, showActions = false, onEdit, onDelete }) => {
           ) : (
             <Link
               to={`/post/${post.slug}`}
-              className="inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-700 group-hover:translate-x-1 transition-transform duration-200"
+              className="inline-flex items-center text-xs font-semibold text-gray-900 hover:text-navy-700 transition-colors"
             >
-              Read more
-              <svg
-                className="w-4 h-4 ml-1"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 5l7 7-7 7"
-                />
-              </svg>
+              Read More →
             </Link>
           )}
         </div>

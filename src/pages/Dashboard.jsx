@@ -125,6 +125,12 @@ const Dashboard = () => {
     setEditingPost(null);
   };
 
+  const handlePostPublishToggle = () => {
+    // Invalidate queries to refresh the data
+    queryClient.invalidateQueries({ queryKey: ["all-posts"] });
+    queryClient.invalidateQueries({ queryKey: ["published-posts"] });
+  };
+
   // ============ RESOURCE HANDLERS ============
   const handleResourceSubmit = async (resourceData) => {
     if (editingResource) {
@@ -153,6 +159,11 @@ const Dashboard = () => {
     setEditingResource(null);
   };
 
+  const handleResourcePublishToggle = () => {
+    // Invalidate queries to refresh the data
+    queryClient.invalidateQueries(["resources"]);
+  };
+
   // ============ RENDER POST FORM ============
   if (showPostForm) {
     return (
@@ -163,9 +174,9 @@ const Dashboard = () => {
           </title>
         </Helmet>
 
-        <div className="min-h-screen py-8">
+        <div className="min-h-screen py-8 bg-gray-50">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="mb-8">
+            <div className="mb-6">
               <h1 className="text-3xl font-bold text-gray-900 mb-2">
                 {editingPost ? "Edit Post" : "Create New Post"}
               </h1>
@@ -203,33 +214,33 @@ const Dashboard = () => {
         />
       </Helmet>
 
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50/30 flex">
+      <div className="min-h-screen bg-gray-50 flex">
         {/* Main Content */}
         <div className="flex-1 py-8 overflow-auto">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             {/* Header */}
             <div className="mb-8">
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent mb-2">
+              <h1 className="text-4xl font-bold text-gray-900 mb-2">
                 Admin Dashboard
               </h1>
-              <p className="text-gray-600 text-lg">
+              <p className="text-gray-600">
                 Manage all your content, resources, and settings in one place
               </p>
             </div>
 
             {/* Tabs */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-2 mb-8 inline-flex flex-wrap gap-2">
+            <div className="bg-white rounded-lg border border-gray-200 p-1 mb-6 inline-flex gap-1">
               <button
                 onClick={() => setActiveTab("posts")}
-                className={`px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-200 ${
+                className={`px-6 py-2.5 rounded-md font-semibold text-sm transition-colors ${
                   activeTab === "posts"
-                    ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg"
-                    : "text-gray-600 hover:bg-gray-50"
+                    ? "bg-navy-800 text-white"
+                    : "text-gray-600 hover:text-gray-900"
                 }`}
               >
                 <div className="flex items-center space-x-2">
                   <svg
-                    className="w-5 h-5"
+                    className="w-4 h-4"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -246,15 +257,15 @@ const Dashboard = () => {
               </button>
               <button
                 onClick={() => setActiveTab("resources")}
-                className={`px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-200 ${
+                className={`px-6 py-2.5 rounded-md font-semibold text-sm transition-colors ${
                   activeTab === "resources"
-                    ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg"
-                    : "text-gray-600 hover:bg-gray-50"
+                    ? "bg-navy-800 text-white"
+                    : "text-gray-600 hover:text-gray-900"
                 }`}
               >
                 <div className="flex items-center space-x-2">
                   <svg
-                    className="w-5 h-5"
+                    className="w-4 h-4"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -278,22 +289,11 @@ const Dashboard = () => {
                 {posts && (
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                     {/* Total Posts Card */}
-                    <div className="group bg-gradient-to-br from-white to-blue-50 rounded-2xl p-6 shadow-md hover:shadow-xl transition-all duration-300 border border-blue-100">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <p className="text-sm font-semibold text-blue-600 uppercase tracking-wide mb-2">
-                            Total Posts
-                          </p>
-                          <p className="text-4xl font-bold text-gray-900 mb-1">
-                            {posts.length}
-                          </p>
-                          <p className="text-sm text-gray-600">
-                            All content created
-                          </p>
-                        </div>
-                        <div className="p-3 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg group-hover:scale-110 transition-transform duration-300">
+                    <div className="bg-white rounded-lg p-6 border border-gray-200">
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="p-3 bg-navy-600 rounded-lg">
                           <svg
-                            className="w-7 h-7 text-white"
+                            className="w-6 h-6 text-white"
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"
@@ -307,23 +307,23 @@ const Dashboard = () => {
                           </svg>
                         </div>
                       </div>
+                      <h3 className="text-xs font-semibold text-navy-600 uppercase tracking-wide mb-2">
+                        Total Posts
+                      </h3>
+                      <p className="text-4xl font-bold text-gray-900 mb-1">
+                        {posts.length}
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        All content created
+                      </p>
                     </div>
 
                     {/* Published Card */}
-                    <div className="group bg-gradient-to-br from-white to-green-50 rounded-2xl p-6 shadow-md hover:shadow-xl transition-all duration-300 border border-green-100">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <p className="text-sm font-semibold text-green-600 uppercase tracking-wide mb-2">
-                            Published
-                          </p>
-                          <p className="text-4xl font-bold text-gray-900 mb-1">
-                            {posts.filter((post) => post.published).length}
-                          </p>
-                          <p className="text-sm text-gray-600">Live articles</p>
-                        </div>
-                        <div className="p-3 bg-gradient-to-br from-green-500 to-green-600 rounded-xl shadow-lg group-hover:scale-110 transition-transform duration-300">
+                    <div className="bg-white rounded-lg p-6 border border-gray-200">
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="p-3 bg-green-600 rounded-lg">
                           <svg
-                            className="w-7 h-7 text-white"
+                            className="w-6 h-6 text-white"
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"
@@ -337,25 +337,21 @@ const Dashboard = () => {
                           </svg>
                         </div>
                       </div>
+                      <h3 className="text-xs font-semibold text-green-600 uppercase tracking-wide mb-2">
+                        Published
+                      </h3>
+                      <p className="text-4xl font-bold text-gray-900 mb-1">
+                        {posts.filter((post) => post.published).length}
+                      </p>
+                      <p className="text-sm text-gray-600">Live articles</p>
                     </div>
 
                     {/* Drafts Card */}
-                    <div className="group bg-gradient-to-br from-white to-amber-50 rounded-2xl p-6 shadow-md hover:shadow-xl transition-all duration-300 border border-amber-100">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <p className="text-sm font-semibold text-amber-600 uppercase tracking-wide mb-2">
-                            Drafts
-                          </p>
-                          <p className="text-4xl font-bold text-gray-900 mb-1">
-                            {posts.filter((post) => !post.published).length}
-                          </p>
-                          <p className="text-sm text-gray-600">
-                            Work in progress
-                          </p>
-                        </div>
-                        <div className="p-3 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl shadow-lg group-hover:scale-110 transition-transform duration-300">
+                    <div className="bg-white rounded-lg p-6 border border-gray-200">
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="p-3 bg-orange-500 rounded-lg">
                           <svg
-                            className="w-7 h-7 text-white"
+                            className="w-6 h-6 text-white"
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"
@@ -369,6 +365,13 @@ const Dashboard = () => {
                           </svg>
                         </div>
                       </div>
+                      <h3 className="text-xs font-semibold text-orange-600 uppercase tracking-wide mb-2">
+                        Drafts
+                      </h3>
+                      <p className="text-4xl font-bold text-gray-900 mb-1">
+                        {posts.filter((post) => !post.published).length}
+                      </p>
+                      <p className="text-sm text-gray-600">Work in progress</p>
                     </div>
                   </div>
                 )}
@@ -377,7 +380,7 @@ const Dashboard = () => {
                 <div className="flex flex-wrap gap-3 mb-6">
                   <button
                     onClick={() => setShowPostForm(true)}
-                    className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl font-semibold hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 active:scale-95"
+                    className="inline-flex items-center px-6 py-3 bg-navy-800 text-white rounded-lg font-semibold hover:bg-navy-900 transition-colors"
                   >
                     <svg
                       className="w-5 h-5 mr-2"
@@ -402,9 +405,9 @@ const Dashboard = () => {
                     {[1, 2, 3, 4, 5, 6].map((i) => (
                       <div
                         key={i}
-                        className="bg-white rounded-2xl p-6 shadow-md animate-pulse"
+                        className="bg-white rounded-lg p-6 border border-gray-200 animate-pulse"
                       >
-                        <div className="bg-gray-200 rounded-xl h-48 mb-4"></div>
+                        <div className="bg-gray-200 rounded h-48 mb-4"></div>
                         <div className="space-y-3">
                           <div className="h-4 bg-gray-200 rounded w-3/4"></div>
                           <div className="h-4 bg-gray-200 rounded w-1/2"></div>
@@ -418,7 +421,7 @@ const Dashboard = () => {
                 {/* Error State */}
                 {postsError && (
                   <div className="max-w-2xl mx-auto">
-                    <div className="bg-gradient-to-br from-red-50 to-red-100 border-2 border-red-200 p-8 rounded-2xl text-center shadow-lg">
+                    <div className="bg-red-50 border border-red-200 p-8 rounded-lg text-center">
                       <div className="w-16 h-16 bg-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
                         <svg
                           className="w-8 h-8 text-white"
@@ -440,7 +443,7 @@ const Dashboard = () => {
                       <p className="text-red-600 mb-4">{postsError.message}</p>
                       <button
                         onClick={() => window.location.reload()}
-                        className="px-6 py-3 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-all duration-200 font-medium shadow-lg"
+                        className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-semibold"
                       >
                         Try Again
                       </button>
@@ -464,6 +467,7 @@ const Dashboard = () => {
                           showActions={true}
                           onEdit={handleEditPost}
                           onDelete={handleDeletePost}
+                          onPublishToggle={handlePostPublishToggle}
                         />
                       ))}
                     </div>
@@ -472,11 +476,11 @@ const Dashboard = () => {
 
                 {/* Empty State */}
                 {posts && posts.length === 0 && (
-                  <div className="text-center py-20">
-                    <div className="max-w-md mx-auto">
-                      <div className="w-24 h-24 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <div className="text-center py-16">
+                    <div className="max-w-md mx-auto bg-white rounded-lg p-8 border border-gray-200">
+                      <div className="w-20 h-20 bg-navy-600 rounded-full flex items-center justify-center mx-auto mb-6">
                         <svg
-                          className="w-12 h-12 text-blue-600"
+                          className="w-10 h-10 text-white"
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"
@@ -492,13 +496,13 @@ const Dashboard = () => {
                       <h3 className="text-2xl font-bold text-gray-900 mb-3">
                         Ready to Start Writing?
                       </h3>
-                      <p className="text-gray-600 text-lg mb-6">
+                      <p className="text-gray-600 mb-6">
                         Create your first post and start sharing your financial
                         insights with the world.
                       </p>
                       <button
                         onClick={() => setShowPostForm(true)}
-                        className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-xl hover:shadow-2xl font-semibold active:scale-95"
+                        className="inline-flex items-center px-6 py-3 bg-navy-800 text-white rounded-lg hover:bg-navy-900 transition-colors font-semibold"
                       >
                         <svg
                           className="w-5 h-5 mr-2"
@@ -526,7 +530,7 @@ const Dashboard = () => {
               <div>
                 {/* Upload/Edit Form */}
                 {showResourceForm && (
-                  <div className="mb-8 bg-white rounded-xl shadow-lg p-6 border border-gray-200">
+                  <div className="mb-8 bg-white rounded-lg p-8 border border-gray-200">
                     <h2 className="text-2xl font-bold text-gray-900 mb-6">
                       {editingResource
                         ? "Edit Resource"
@@ -542,10 +546,10 @@ const Dashboard = () => {
 
                 {/* Upload Button */}
                 {!showResourceForm && (
-                  <div className="mb-8">
+                  <div className="mb-6">
                     <button
                       onClick={() => setShowResourceForm(true)}
-                      className="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-lg hover:shadow-xl font-semibold flex items-center space-x-2"
+                      className="px-6 py-3 bg-navy-800 text-white rounded-lg hover:bg-navy-900 transition-colors font-semibold flex items-center space-x-2"
                     >
                       <svg
                         className="w-5 h-5"
@@ -569,20 +573,24 @@ const Dashboard = () => {
                 {resourcesLoading ? (
                   <div className="flex items-center justify-center py-20">
                     <div className="text-center">
-                      <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-                      <p className="text-gray-600">Loading resources...</p>
+                      <div className="w-12 h-12 border-4 border-navy-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+                      <p className="text-gray-600 font-semibold">
+                        Loading resources...
+                      </p>
                     </div>
                   </div>
                 ) : resourcesError ? (
-                  <div className="bg-red-50 border border-red-200 text-red-700 px-6 py-4 rounded-xl">
-                    <p className="font-semibold">Error loading resources</p>
+                  <div className="bg-red-50 border border-red-200 text-red-700 px-6 py-4 rounded-lg">
+                    <p className="font-bold">Error loading resources</p>
                     <p className="text-sm mt-1">{resourcesError.message}</p>
                   </div>
                 ) : resources && resources.length > 0 ? (
                   <>
-                    <div className="mb-4 text-sm text-gray-600">
-                      {resources.length} resource
-                      {resources.length !== 1 ? "s" : ""} total
+                    <div className="mb-4">
+                      <p className="text-gray-600 font-semibold">
+                        {resources.length} resource
+                        {resources.length !== 1 ? "s" : ""} total
+                      </p>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                       {resources.map((resource) => (
@@ -592,19 +600,55 @@ const Dashboard = () => {
                           onEdit={handleEditResource}
                           onDelete={handleDeleteResource}
                           isAdmin={true}
+                          onPublishToggle={handleResourcePublishToggle}
                         />
                       ))}
                     </div>
                   </>
                 ) : (
-                  <div className="text-center py-20">
-                    <div className="text-6xl mb-4">📭</div>
-                    <h3 className="text-2xl font-bold text-gray-900 mb-2">
-                      No resources yet
-                    </h3>
-                    <p className="text-gray-600">
-                      Upload your first resource to get started
-                    </p>
+                  <div className="text-center py-16">
+                    <div className="max-w-md mx-auto bg-white rounded-lg p-8 border border-gray-200">
+                      <div className="w-20 h-20 bg-navy-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <svg
+                          className="w-10 h-10 text-white"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                          />
+                        </svg>
+                      </div>
+                      <h3 className="text-2xl font-bold text-gray-900 mb-3">
+                        No resources yet
+                      </h3>
+                      <p className="text-gray-600 mb-6">
+                        Upload your first resource to get started
+                      </p>
+                      <button
+                        onClick={() => setShowResourceForm(true)}
+                        className="inline-flex items-center px-6 py-3 bg-navy-800 text-white rounded-lg hover:bg-navy-900 transition-colors font-semibold"
+                      >
+                        <svg
+                          className="w-5 h-5 mr-2"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                          />
+                        </svg>
+                        Upload First Resource
+                      </button>
+                    </div>
                   </div>
                 )}
               </div>

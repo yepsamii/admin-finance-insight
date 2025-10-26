@@ -115,49 +115,27 @@ const Blog = () => {
         />
       </Helmet>
 
-      <div className="min-h-screen">
-        {/* Hero Section */}
-        <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-            <div className="text-center">
-              <h1 className="text-4xl md:text-5xl font-bold mb-4">
-                📝 Financial Insights Blog
+      <div className="min-h-screen bg-gray-50">
+        {/* Posts Section */}
+        <section className="py-12">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            {/* Page Header */}
+            <div className="mb-8">
+              <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
+                All Blog Posts
               </h1>
-              <p className="text-xl text-blue-100 max-w-2xl mx-auto">
-                Explore our latest articles on financial planning, investment
-                strategies, and market analysis
+              <p className="text-gray-600">
+                Browse our collection of financial insights and expert advice.
               </p>
             </div>
-          </div>
-        </div>
 
-        {/* Posts Section */}
-        <section className="py-16 md:py-24 bg-gradient-to-br from-gray-50 via-white to-blue-50/30">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex flex-col lg:flex-row gap-8">
-              {/* Sidebar - Filter */}
-              <aside className="lg:w-80 flex-shrink-0">
-                <FilterSidebar
-                  selectedCategory={selectedCategory}
-                  selectedTags={selectedTags}
-                  onCategoryChange={handleCategoryChange}
-                  onTagChange={handleTagChange}
-                  onResetFilters={handleResetFilters}
-                  postCounts={postCounts}
-                />
-              </aside>
-
               {/* Main Content */}
-              <div className="flex-1">
+              <div className="flex-1 lg:order-1 order-2">
                 {/* Controls Bar */}
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                   <div>
-                    <h2 className="text-2xl font-bold text-gray-900">
-                      {selectedCategory || selectedTags.length > 0
-                        ? "Filtered Posts"
-                        : "All Posts"}
-                    </h2>
-                    <p className="text-gray-600 mt-1">
+                    <p className="text-sm text-gray-600">
                       Showing {filteredAndSortedPosts.length} of{" "}
                       {posts?.length || 0}{" "}
                       {posts?.length === 1 ? "post" : "posts"}
@@ -170,12 +148,12 @@ const Blog = () => {
                     <select
                       value={sortBy}
                       onChange={(e) => setSortBy(e.target.value)}
-                      className="appearance-none bg-white border border-gray-200 rounded-xl px-4 py-2.5 pr-10 text-sm font-semibold text-gray-900 hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent cursor-pointer transition-all duration-200"
+                      className="appearance-none bg-white border border-gray-200 rounded px-3 py-2 pr-8 text-sm text-gray-700 hover:border-gray-300 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 cursor-pointer transition-all duration-200 shadow-sm"
                     >
-                      <option value="newest">Sort by: Newest</option>
-                      <option value="oldest">Sort by: Oldest</option>
+                      <option value="newest">Newest</option>
+                      <option value="oldest">Oldest</option>
                     </select>
-                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
+                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-500">
                       <svg
                         className="w-4 h-4"
                         fill="none"
@@ -238,14 +216,12 @@ const Blog = () => {
 
                 {/* Posts Grid */}
                 {filteredAndSortedPosts.length > 0 && (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-slide-in-up">
-                    {filteredAndSortedPosts.map((post, index) => (
-                      <div
+                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                    {filteredAndSortedPosts.map((post) => (
+                      <PostCard
                         key={post.id}
-                        style={{ animationDelay: `${index * 0.05}s` }}
-                      >
-                        <PostCard post={post} />
-                      </div>
+                        post={post}
+                      />
                     ))}
                   </div>
                 )}
@@ -258,7 +234,7 @@ const Blog = () => {
                   filteredAndSortedPosts.length === 0 && (
                     <div className="text-center py-20">
                       <div className="max-w-md mx-auto">
-                        <div className="w-24 h-24 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
                           <svg
                             className="w-12 h-12 text-gray-400"
                             fill="none"
@@ -281,7 +257,7 @@ const Blog = () => {
                         </p>
                         <button
                           onClick={handleResetFilters}
-                          className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-lg hover:shadow-xl"
+                          className="inline-flex items-center px-6 py-3 bg-gray-900 text-white rounded-xl font-semibold hover:bg-gray-800 transition-all duration-200 shadow-lg hover:shadow-xl"
                         >
                           <svg
                             className="w-5 h-5 mr-2"
@@ -306,9 +282,9 @@ const Blog = () => {
                 {!isLoading && !error && posts && posts.length === 0 && (
                   <div className="text-center py-20">
                     <div className="max-w-md mx-auto">
-                      <div className="w-24 h-24 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                      <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
                         <svg
-                          className="w-12 h-12 text-blue-600"
+                          className="w-12 h-12 text-gray-400"
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"
@@ -327,20 +303,24 @@ const Blog = () => {
                       <p className="text-gray-600 text-lg mb-6">
                         We're working on some amazing content. Check back soon!
                       </p>
-                      <div className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-50 to-purple-50 text-blue-700 rounded-xl font-medium">
-                        <svg
-                          className="w-5 h-5 mr-2"
-                          fill="currentColor"
-                          viewBox="0 0 20 20"
-                        >
-                          <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" />
-                        </svg>
-                        Coming Soon
-                      </div>
                     </div>
                   </div>
                 )}
               </div>
+
+              {/* Sidebar - Filter (Right Side) */}
+              <aside className="lg:w-80 flex-shrink-0 lg:order-2 order-1">
+                <div className="sticky top-20">
+                  <FilterSidebar
+                    selectedCategory={selectedCategory}
+                    selectedTags={selectedTags}
+                    onCategoryChange={handleCategoryChange}
+                    onTagChange={handleTagChange}
+                    onResetFilters={handleResetFilters}
+                    postCounts={postCounts}
+                  />
+                </div>
+              </aside>
             </div>
           </div>
         </section>
