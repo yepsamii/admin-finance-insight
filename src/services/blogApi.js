@@ -214,7 +214,7 @@ export const postsApi = {
     return data;
   },
 
-  // Get single post by slug
+  // Get single post by slug (public view - only published posts)
   async getPostBySlug(slug) {
     const { data, error } = await supabase
       .from("posts")
@@ -236,6 +236,7 @@ export const postsApi = {
       `
       )
       .eq("slug", slug)
+      .eq("published", true)
       .single();
 
     if (error) throw error;

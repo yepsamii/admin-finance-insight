@@ -5,7 +5,7 @@ import { useState } from "react";
 const Layout = ({ children }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, profile, signOut, loading } = useAuth();
+  const { user, profile, signOut, loading, isAdmin } = useAuth();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -27,7 +27,9 @@ const Layout = ({ children }) => {
     ? [
         { path: "/", label: "Blog", icon: "home" },
         { path: "/resources", label: "Resources", icon: "resources" },
-        { path: "/dashboard", label: "Dashboard", icon: "dashboard" },
+        ...(isAdmin
+          ? [{ path: "/dashboard", label: "Dashboard", icon: "dashboard" }]
+          : []),
       ]
     : [
         { path: "/", label: "Blog", icon: "home" },
