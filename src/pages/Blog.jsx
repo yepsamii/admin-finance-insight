@@ -125,7 +125,7 @@ const Blog = () => {
                 All Blog Posts
               </h1>
               <p className="text-gray-600">
-                Browse our collection of financial insights and expert advice.
+                Browse our collection of financial insights and expert advice....
               </p>
             </div>
 
