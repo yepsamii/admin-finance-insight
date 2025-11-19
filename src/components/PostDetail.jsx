@@ -7,6 +7,8 @@ import toast from "react-hot-toast";
 import "@blocknote/core/fonts/inter.css";
 import "@blocknote/mantine/style.css";
 import PostPageSidebar from "./PostPageSidebar";
+import { useQuery } from "@tanstack/react-query";
+import { postsApi } from "../services/blogApi";
 
 const PostDetail = ({ post }) => {
   const [imageError, setImageError] = useState(false);
@@ -16,6 +18,17 @@ const PostDetail = ({ post }) => {
   // Initialize BlockNote editor in read-only mode
   // This MUST be called unconditionally (hooks rule)
   const editor = useCreateBlockNote({ editable: false });
+
+  // Extract tag IDs from post
+  const tagIds = post?.post_tags?.map((pt) => pt.tags?.id).filter(Boolean) || [];
+
+  // Fetch related posts based on category and tags
+  const { data: relatedPosts, isLoading: relatedPostsLoading } = useQuery({
+    queryKey: ["relatedPosts", post?.id, post?.category_id, tagIds],
+    queryFn: () =>
+      postsApi.getRelatedPosts(post.id, post.category_id, tagIds, 3),
+    enabled: !!post?.id,
+  });
 
   // Show post not found toast only once
   useEffect(() => {
@@ -328,27 +341,53 @@ const PostDetail = ({ post }) => {
               <h3 className="text-xl font-bold text-gray-900 mb-6">
                 Related Posts
               </h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {/* Mock related posts */}
-                {[1, 2, 3].map((i) => (
-                  <Link
-                    key={i}
-                    to="/"
-                    className="group"
-                  >
-                    <div className="aspect-video bg-gray-200 rounded mb-3 overflow-hidden">
-                      <div className="w-full h-full group-hover:scale-110 transition-transform duration-300"></div>
-                    </div>
-                    <span className="text-xs font-semibold text-gray-500 uppercase mb-2 block">
-                      Share Market
-                    </span>
-                    <h4 className="font-bold text-gray-900 group-hover:text-blue-600 line-clamp-2">
-                      Navigating the 2025 Share Market: Top Stocks to Watch
-                    </h4>
-                    <p className="text-xs text-gray-500 mt-2">July 7, 2025</p>
-                  </Link>
-                ))}
-              </div>
+              {relatedPostsLoading ? (
+                <div className="flex justify-center py-8">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+                </div>
+              ) : relatedPosts && relatedPosts.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {relatedPosts.map((relatedPost) => (
+                    <Link
+                      key={relatedPost.id}
+                      to={`/post/${relatedPost.slug}`}
+                      className="group"
+                    >
+                      <div className="aspect-video bg-gray-200 rounded mb-3 overflow-hidden">
+                        {relatedPost.header_image_url ? (
+                          <img
+                            src={relatedPost.header_image_url}
+                            alt={relatedPost.title}
+                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                            onError={(e) => {
+                              e.target.style.display = "none";
+                            }}
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-gray-200"></div>
+                        )}
+                      </div>
+                      {relatedPost.categories?.name && (
+                        <span className="text-xs font-semibold text-gray-500 uppercase mb-2 block">
+                          {relatedPost.categories.name}
+                        </span>
+                      )}
+                      <h4 className="font-bold text-gray-900 group-hover:text-blue-600 line-clamp-2">
+                        {relatedPost.title}
+                      </h4>
+                      <p className="text-xs text-gray-500 mt-2">
+                        {formatDate(
+                          relatedPost.published_at || relatedPost.created_at
+                        )}
+                      </p>
+                    </Link>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-center text-gray-500 py-8">
+                  No related posts found
+                </p>
+              )}
             </div>
           </article>
         </div>

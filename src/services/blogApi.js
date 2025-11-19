@@ -216,6 +216,122 @@ export const postsApi = {
     return data;
   },
 
+  // Get related posts based on category or tags
+  async getRelatedPosts(postId, categoryId, tagIds = [], limit = 3) {
+    // First, try to get posts with matching tags
+    let relatedPosts = [];
+
+    if (tagIds && tagIds.length > 0) {
+      const { data: tagMatchedPosts, error: tagError } = await supabase
+        .from("posts")
+        .select(
+          `
+          *,
+          categories (
+            id,
+            name,
+            slug
+          ),
+          post_tags (
+            tag_id,
+            tags (
+              id,
+              name,
+              slug
+            )
+          )
+        `
+        )
+        .eq("published", true)
+        .neq("id", postId)
+        .order("published_at", { ascending: false })
+        .limit(limit * 3); // Get more to filter
+
+      if (!tagError && tagMatchedPosts) {
+        // Filter posts that have at least one matching tag
+        relatedPosts = tagMatchedPosts.filter((post) => {
+          const postTagIds = post.post_tags?.map((pt) => pt.tag_id) || [];
+          return tagIds.some((tagId) => postTagIds.includes(tagId));
+        });
+      }
+    }
+
+    // If we don't have enough posts from tags, add posts from the same category
+    if (relatedPosts.length < limit && categoryId) {
+      const { data: categoryPosts, error: categoryError } = await supabase
+        .from("posts")
+        .select(
+          `
+          *,
+          categories (
+            id,
+            name,
+            slug
+          ),
+          post_tags (
+            tags (
+              id,
+              name,
+              slug
+            )
+          )
+        `
+        )
+        .eq("published", true)
+        .eq("category_id", categoryId)
+        .neq("id", postId)
+        .order("published_at", { ascending: false })
+        .limit(limit);
+
+      if (!categoryError && categoryPosts) {
+        // Add category posts that aren't already in relatedPosts
+        const existingIds = relatedPosts.map((p) => p.id);
+        const newPosts = categoryPosts.filter(
+          (post) => !existingIds.includes(post.id)
+        );
+        relatedPosts = [...relatedPosts, ...newPosts];
+      }
+    }
+
+    // If still not enough, get latest posts
+    if (relatedPosts.length < limit) {
+      const { data: latestPosts, error: latestError } = await supabase
+        .from("posts")
+        .select(
+          `
+          *,
+          categories (
+            id,
+            name,
+            slug
+          ),
+          post_tags (
+            tags (
+              id,
+              name,
+              slug
+            )
+          )
+        `
+        )
+        .eq("published", true)
+        .neq("id", postId)
+        .order("published_at", { ascending: false })
+        .limit(limit);
+
+      if (!latestError && latestPosts) {
+        const existingIds = relatedPosts.map((p) => p.id);
+        const newPosts = latestPosts.filter(
+          (post) => !existingIds.includes(post.id)
+        );
+        relatedPosts = [...relatedPosts, ...newPosts];
+      }
+    }
+
+    // Return only the requested limit
+    return relatedPosts.slice(0, limit);
+  },
+
   // Get all posts for admin (including drafts)
   async getAllPosts() {
     const { data, error } = await supabase
