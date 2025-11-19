@@ -15,6 +15,7 @@ import Resources from "./pages/Resources";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import ErrorBoundary from "./components/ErrorBoundary";
+import { Toaster } from "react-hot-toast";
 
 // Create a client with proper error handling
 const queryClient = new QueryClient({
@@ -46,6 +47,31 @@ const queryClient = new QueryClient({
 const App = () => {
   return (
     <ErrorBoundary>
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          duration: 4000,
+          style: {
+            background: "#fff",
+            color: "#363636",
+            fontSize: "14px",
+          },
+          success: {
+            duration: 3000,
+            iconTheme: {
+              primary: "#10b981",
+              secondary: "#fff",
+            },
+          },
+          error: {
+            duration: 5000,
+            iconTheme: {
+              primary: "#ef4444",
+              secondary: "#fff",
+            },
+          },
+        }}
+      />
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
           <HelmetProvider>

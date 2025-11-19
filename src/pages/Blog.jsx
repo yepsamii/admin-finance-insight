@@ -1,6 +1,7 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Helmet } from "react-helmet-async";
+import toast from "react-hot-toast";
 import { postsApi } from "../services/blogApi";
 import PostCard from "../components/PostCard";
 import FilterSidebar from "../components/FilterSidebar";
@@ -17,7 +18,18 @@ const Blog = () => {
   } = useQuery({
     queryKey: ["published-posts"],
     queryFn: postsApi.getPublishedPosts,
+    onError: (error) => {
+      console.error("Error fetching posts:", error);
+      toast.error(`Failed to load posts: ${error.message || "Unknown error"}`);
+    },
   });
+
+  // Show toast on error
+  useEffect(() => {
+    if (error) {
+      toast.error(`Error loading posts: ${error.message || "Unknown error"}`);
+    }
+  }, [error]);
 
   // Calculate post counts for categories and tags
   const postCounts = useMemo(() => {
@@ -125,7 +137,8 @@ const Blog = () => {
                 All Blog Posts
               </h1>
               <p className="text-gray-600">
-                Browse our collection of financial insights and expert advice....
+                Browse our collection of financial insights and expert
+                advice....
               </p>
             </div>
 

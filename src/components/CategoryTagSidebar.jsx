@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import toast from "react-hot-toast";
 import { categoriesApi, tagsApi } from "../services/blogApi";
 
 const CategoryTagSidebar = () => {
@@ -17,11 +18,21 @@ const CategoryTagSidebar = () => {
   const { data: categories, isLoading: categoriesLoading } = useQuery({
     queryKey: ["categories"],
     queryFn: categoriesApi.getAll,
+    onError: (error) => {
+      console.error("Error fetching categories:", error);
+      toast.error(
+        `Failed to load categories: ${error.message || "Unknown error"}`
+      );
+    },
   });
 
   const { data: tags, isLoading: tagsLoading } = useQuery({
     queryKey: ["tags"],
     queryFn: tagsApi.getAll,
+    onError: (error) => {
+      console.error("Error fetching tags:", error);
+      toast.error(`Failed to load tags: ${error.message || "Unknown error"}`);
+    },
   });
 
   // Category Mutations
@@ -30,6 +41,11 @@ const CategoryTagSidebar = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["categories"] });
       setCategoryForm({ name: "", description: "" });
+      toast.success("Category created successfully!");
+    },
+    onError: (error) => {
+      console.error("Error creating category:", error);
+      toast.error(error.message || "Failed to create category");
     },
   });
 
@@ -39,6 +55,11 @@ const CategoryTagSidebar = () => {
       queryClient.invalidateQueries({ queryKey: ["categories"] });
       setEditingCategory(null);
       setCategoryForm({ name: "", description: "" });
+      toast.success("Category updated successfully!");
+    },
+    onError: (error) => {
+      console.error("Error updating category:", error);
+      toast.error(error.message || "Failed to update category");
     },
   });
 
@@ -46,6 +67,11 @@ const CategoryTagSidebar = () => {
     mutationFn: categoriesApi.delete,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["categories"] });
+      toast.success("Category deleted successfully!");
+    },
+    onError: (error) => {
+      console.error("Error deleting category:", error);
+      toast.error(error.message || "Failed to delete category");
     },
   });
 
@@ -55,6 +81,11 @@ const CategoryTagSidebar = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tags"] });
       setTagForm({ name: "" });
+      toast.success("Tag created successfully!");
+    },
+    onError: (error) => {
+      console.error("Error creating tag:", error);
+      toast.error(error.message || "Failed to create tag");
     },
   });
 
@@ -64,6 +95,11 @@ const CategoryTagSidebar = () => {
       queryClient.invalidateQueries({ queryKey: ["tags"] });
       setEditingTag(null);
       setTagForm({ name: "" });
+      toast.success("Tag updated successfully!");
+    },
+    onError: (error) => {
+      console.error("Error updating tag:", error);
+      toast.error(error.message || "Failed to update tag");
     },
   });
 
@@ -71,6 +107,11 @@ const CategoryTagSidebar = () => {
     mutationFn: tagsApi.delete,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tags"] });
+      toast.success("Tag deleted successfully!");
+    },
+    onError: (error) => {
+      console.error("Error deleting tag:", error);
+      toast.error(error.message || "Failed to delete tag");
     },
   });
 

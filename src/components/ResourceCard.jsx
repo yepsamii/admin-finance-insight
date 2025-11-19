@@ -1,4 +1,5 @@
 import { useState } from "react";
+import toast from "react-hot-toast";
 import { getFileIcon, resourcesApi } from "../services/resourcesApi";
 
 const ResourceCard = ({
@@ -19,9 +20,10 @@ const ResourceCard = ({
       setIsDeleting(true);
       try {
         await onDelete(resource.id);
+        toast.success("Resource deleted successfully!");
       } catch (error) {
         console.error("Error deleting resource:", error);
-        alert("Failed to delete resource");
+        toast.error(error.message || "Failed to delete resource");
       } finally {
         setIsDeleting(false);
       }
@@ -36,13 +38,18 @@ const ResourceCard = ({
         published: !currentPublishedState,
       });
       setCurrentPublishedState(!currentPublishedState);
+      toast.success(
+        !currentPublishedState
+          ? "Resource published successfully!"
+          : "Resource unpublished successfully!"
+      );
       // Notify parent component if callback provided
       if (onPublishToggle) {
         onPublishToggle(resource.id, !currentPublishedState);
       }
     } catch (error) {
       console.error("Error toggling publish status:", error);
-      alert("Failed to update publish status");
+      toast.error(error.message || "Failed to update publish status");
     } finally {
       setIsTogglingPublish(false);
     }

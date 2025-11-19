@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Helmet } from "react-helmet-async";
+import toast from "react-hot-toast";
 import { postsApi } from "../services/blogApi";
 import { resourcesApi } from "../services/resourcesApi";
 import PostCard from "../components/PostCard";
@@ -25,6 +26,10 @@ const Dashboard = () => {
   } = useQuery({
     queryKey: ["all-posts"],
     queryFn: postsApi.getAllPosts,
+    onError: (error) => {
+      console.error("Error fetching posts:", error);
+      toast.error(`Failed to load posts: ${error.message || "Unknown error"}`);
+    },
   });
 
   const createPostMutation = useMutation({
@@ -33,6 +38,11 @@ const Dashboard = () => {
       queryClient.invalidateQueries({ queryKey: ["all-posts"] });
       queryClient.invalidateQueries({ queryKey: ["published-posts"] });
       setShowPostForm(false);
+      toast.success("Post created successfully!");
+    },
+    onError: (error) => {
+      console.error("Error creating post:", error);
+      toast.error(error.message || "Failed to create post");
     },
   });
 
@@ -43,6 +53,11 @@ const Dashboard = () => {
       queryClient.invalidateQueries({ queryKey: ["published-posts"] });
       setShowPostForm(false);
       setEditingPost(null);
+      toast.success("Post updated successfully!");
+    },
+    onError: (error) => {
+      console.error("Error updating post:", error);
+      toast.error(error.message || "Failed to update post");
     },
   });
 
@@ -51,6 +66,11 @@ const Dashboard = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["all-posts"] });
       queryClient.invalidateQueries({ queryKey: ["published-posts"] });
+      toast.success("Post deleted successfully!");
+    },
+    onError: (error) => {
+      console.error("Error deleting post:", error);
+      toast.error(error.message || "Failed to delete post");
     },
   });
 
@@ -62,6 +82,12 @@ const Dashboard = () => {
   } = useQuery({
     queryKey: ["resources"],
     queryFn: resourcesApi.getAllResources,
+    onError: (error) => {
+      console.error("Error fetching resources:", error);
+      toast.error(
+        `Failed to load resources: ${error.message || "Unknown error"}`
+      );
+    },
   });
 
   const createResourceMutation = useMutation({
@@ -69,10 +95,11 @@ const Dashboard = () => {
     onSuccess: () => {
       queryClient.invalidateQueries(["resources"]);
       setShowResourceForm(false);
-      alert("Resource uploaded successfully!");
+      toast.success("Resource uploaded successfully!");
     },
     onError: (error) => {
-      alert(error.message || "Failed to upload resource");
+      console.error("Error creating resource:", error);
+      toast.error(error.message || "Failed to upload resource");
     },
   });
 
@@ -82,10 +109,11 @@ const Dashboard = () => {
       queryClient.invalidateQueries(["resources"]);
       setShowResourceForm(false);
       setEditingResource(null);
-      alert("Resource updated successfully!");
+      toast.success("Resource updated successfully!");
     },
     onError: (error) => {
-      alert(error.message || "Failed to update resource");
+      console.error("Error updating resource:", error);
+      toast.error(error.message || "Failed to update resource");
     },
   });
 
@@ -93,10 +121,11 @@ const Dashboard = () => {
     mutationFn: resourcesApi.deleteResource,
     onSuccess: () => {
       queryClient.invalidateQueries(["resources"]);
-      alert("Resource deleted successfully!");
+      toast.success("Resource deleted successfully!");
     },
     onError: (error) => {
-      alert(error.message || "Failed to delete resource");
+      console.error("Error deleting resource:", error);
+      toast.error(error.message || "Failed to delete resource");
     },
   });
 

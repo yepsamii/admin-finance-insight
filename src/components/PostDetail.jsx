@@ -2,34 +2,128 @@ import { Link } from "react-router-dom";
 import { formatDate } from "../utils/dateFormatter";
 import { useCreateBlockNote } from "@blocknote/react";
 import { BlockNoteView } from "@blocknote/mantine";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 import "@blocknote/core/fonts/inter.css";
 import "@blocknote/mantine/style.css";
 import PostPageSidebar from "./PostPageSidebar";
 
 const PostDetail = ({ post }) => {
-  // Initialize BlockNote editor in read-only mode
-  const editor = useCreateBlockNote({ editable: false });
-  console.log(post);
+  const [imageError, setImageError] = useState(false);
+  const [editorError, setEditorError] = useState(false);
+  const [postNotFoundShown, setPostNotFoundShown] = useState(false);
 
+  // Initialize BlockNote editor in read-only mode
+  // This MUST be called unconditionally (hooks rule)
+  const editor = useCreateBlockNote({ editable: false });
+
+  // Show post not found toast only once
   useEffect(() => {
-    if (post && post.content) {
+    if (!post && !postNotFoundShown) {
+      toast.error("Post not found. It may have been removed or doesn't exist.");
+      setPostNotFoundShown(true);
+    }
+  }, [post, postNotFoundShown]);
+
+  // Load content into editor with error handling
+  useEffect(() => {
+    if (!editor || !post || !post.content) return;
+
+    try {
+      // Check if content is empty or invalid
+      if (post.content.trim() === "") {
+        toast.error("Post content is empty");
+        return;
+      }
+
+      const blocks = JSON.parse(post.content);
+
+      // Validate parsed blocks
+      if (!Array.isArray(blocks)) {
+        throw new Error("Invalid content format: expected array of blocks");
+      }
+
+      editor.replaceBlocks(editor.document, blocks);
+    } catch (error) {
+      console.error("Error parsing content:", error);
+      toast.error("Failed to load post content. Some formatting may be lost.");
+
+      // Fallback: try to display as plain text
       try {
-        const blocks = JSON.parse(post.content);
-        editor.replaceBlocks(editor.document, blocks);
-      } catch (error) {
-        // If content is not valid JSON, treat it as plain text
-        console.error("Error parsing content:", error);
         editor.replaceBlocks(editor.document, [
           {
             type: "paragraph",
             content: post.content,
           },
         ]);
+      } catch (fallbackError) {
+        console.error("Fallback content display failed:", fallbackError);
+        toast.error("Unable to display post content");
+        setEditorError(true);
       }
     }
   }, [post, editor]);
 
+  // Validate critical post data
+  useEffect(() => {
+    if (post) {
+      if (!post.title || post.title.trim() === "") {
+        toast.error("Post is missing a title");
+      }
+      if (!post.content) {
+        toast.error("Post content is unavailable");
+      }
+    }
+  }, [post]);
+
+  // Handle image loading error
+  const handleImageError = (e) => {
+    console.error("Image failed to load:", post?.header_image_url);
+    setImageError(true);
+    toast.error("Failed to load post header image");
+    e.target.style.display = "none";
+  };
+
+  // Safe tag mapping with error handling
+  const getTags = () => {
+    try {
+      if (!post?.post_tags || !Array.isArray(post.post_tags)) {
+        return null;
+      }
+
+      const tags = post.post_tags
+        .map((tag) => {
+          if (!tag?.tags?.name) {
+            console.warn("Invalid tag structure:", tag);
+            return null;
+          }
+          return tag.tags.name;
+        })
+        .filter(Boolean);
+
+      return tags.length > 0 ? tags.join(", ") : null;
+    } catch (error) {
+      console.error("Error processing tags:", error);
+      toast.error("Failed to load post tags");
+      return null;
+    }
+  };
+
+  // Safe date formatting with error handling
+  const formatDateSafe = (date) => {
+    try {
+      if (!date) {
+        throw new Error("Date is null or undefined");
+      }
+      return formatDate(date);
+    } catch (error) {
+      console.error("Error formatting date:", date, error);
+      toast.error("Error displaying date information");
+      return "Date unavailable";
+    }
+  };
+
+  // Post not found UI (early return after all hooks)
   if (!post) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-50">
@@ -89,19 +183,21 @@ const PostDetail = ({ post }) => {
           {/* Main Content */}
           <article className="w-full order-1 lg:order-2 bg-white rounded-lg border border-gray-200 p-8">
             {/* Header Image */}
-            {post.header_image_url && (
-              <figure className="w-full relative aspect-video mb-8 rounded">
+            {post.header_image_url && !imageError && (
+              <figure className="w-full relative aspect-video mb-8 rounded overflow-hidden bg-gray-100">
                 <img
                   src={post.header_image_url}
-                  alt={post.title}
-                  className="w-full object-cover"
+                  alt={post.title || "Post header image"}
+                  className="w-full h-full object-cover"
+                  onError={handleImageError}
+                  loading="lazy"
                 />
               </figure>
             )}
 
             {/* Category & Meta Bar */}
             <div className="mb-4">
-              {post.categories && (
+              {post.categories?.name && (
                 <span className="inline-block text-xs font-semibold text-gray-500 uppercase tracking-wide">
                   {post.categories.name}
                 </span>
@@ -110,7 +206,7 @@ const PostDetail = ({ post }) => {
 
             {/* Title */}
             <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 leading-tight">
-              {post.title}
+              {post.title || "Untitled Post"}
             </h1>
 
             {/* Subtitle/Description */}
@@ -122,7 +218,7 @@ const PostDetail = ({ post }) => {
 
             {/* Tags Information */}
             <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500 mb-8 pb-6 border-b border-gray-200">
-              {post.post_tags && post.post_tags.length > 0 && (
+              {getTags() && (
                 <div className="flex items-center">
                   <svg
                     className="w-4 h-4 mr-1.5"
@@ -135,9 +231,7 @@ const PostDetail = ({ post }) => {
                       clipRule="evenodd"
                     />
                   </svg>
-                  <span>
-                    {post.post_tags.map((tag) => tag.tags.name).join(", ")}
-                  </span>
+                  <span>{getTags()}</span>
                 </div>
               )}
 
@@ -155,24 +249,43 @@ const PostDetail = ({ post }) => {
                     d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
                   />
                 </svg>
-                <span>{formatDate(post.published_at || post.created_at)}</span>
+                <span>
+                  {formatDateSafe(post.published_at || post.created_at)}
+                </span>
               </div>
 
               <div className="flex items-center">
                 <span>
-                  Updated on {formatDate(post.updated_at || post.created_at)}
+                  Updated on{" "}
+                  {formatDateSafe(post.updated_at || post.created_at)}
                 </span>
               </div>
             </div>
 
             {/* Content */}
-            {/* <div className="blog-content prose prose-lg max-w-none mb-12">
-              <BlockNoteView
-                editor={editor}
-                theme="light"
-                editable={false}
-              />
-            </div> */}
+            <div className="blog-content prose prose-lg mb-12 max-w-[798px] font">
+              {editorError ? (
+                <div className="p-6 bg-red-50 border border-red-200 rounded-lg">
+                  <h3 className="text-red-800 font-semibold mb-2">
+                    Content Display Error
+                  </h3>
+                  <p className="text-red-600 text-sm">
+                    Unable to display the post content. Please try refreshing
+                    the page.
+                  </p>
+                </div>
+              ) : editor ? (
+                <BlockNoteView
+                  editor={editor}
+                  theme="light"
+                  editable={false}
+                />
+              ) : (
+                <div className="p-6 bg-gray-50 border border-gray-200 rounded-lg">
+                  <p className="text-gray-600 text-sm">Loading content...</p>
+                </div>
+              )}
+            </div>
 
             {/* Share This Article */}
             <div className="mt-12 pt-6 border-t border-gray-200">

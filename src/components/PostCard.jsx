@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { useState } from "react";
+import toast from "react-hot-toast";
 import { formatDate } from "../utils/dateFormatter";
 import { truncateText } from "../utils/textHelpers";
 import { postsApi } from "../services/blogApi";
@@ -27,13 +28,18 @@ const PostCard = ({
         published: !currentPublishedState,
       });
       setCurrentPublishedState(!currentPublishedState);
+      toast.success(
+        !currentPublishedState
+          ? "Post published successfully!"
+          : "Post unpublished successfully!"
+      );
       // Notify parent component if callback provided
       if (onPublishToggle) {
         onPublishToggle(post.id, !currentPublishedState);
       }
     } catch (error) {
       console.error("Error toggling publish status:", error);
-      alert("Failed to update publish status");
+      toast.error(error.message || "Failed to update publish status");
     } finally {
       setIsTogglingPublish(false);
     }
