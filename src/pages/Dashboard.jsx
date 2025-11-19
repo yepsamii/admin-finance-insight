@@ -1,13 +1,15 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Helmet } from "react-helmet-async";
-import { postsApi } from "../services/blogApi";
+import toast from "react-hot-toast";
+import { postsApi, categoriesApi, tagsApi } from "../services/blogApi";
 import { resourcesApi } from "../services/resourcesApi";
 import PostCard from "../components/PostCard";
 import PostForm from "../components/PostForm";
 import ResourceCard from "../components/ResourceCard";
 import ResourceForm from "../components/ResourceForm";
 import CategoryTagSidebar from "../components/CategoryTagSidebar";
+import { useAuth } from "../contexts/AuthContext";
 
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState("posts");
@@ -15,7 +17,33 @@ const Dashboard = () => {
   const [editingPost, setEditingPost] = useState(null);
   const [showResourceForm, setShowResourceForm] = useState(false);
   const [editingResource, setEditingResource] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedTags, setSelectedTags] = useState([]);
+  const [sortBy, setSortBy] = useState("newest");
   const queryClient = useQueryClient();
+  const { user } = useAuth();
+
+  // ============ CATEGORIES & TAGS QUERIES ============
+  const { data: categories } = useQuery({
+    queryKey: ["categories"],
+    queryFn: categoriesApi.getAll,
+    onError: (error) => {
+      console.error("Error fetching categories:", error);
+      toast.error(
+        `Failed to load categories: ${error.message || "Unknown error"}`
+      );
+    },
+  });
+
+  const { data: tags } = useQuery({
+    queryKey: ["tags"],
+    queryFn: tagsApi.getAll,
+    onError: (error) => {
+      console.error("Error fetching tags:", error);
+      toast.error(`Failed to load tags: ${error.message || "Unknown error"}`);
+    },
+  });
 
   // ============ POSTS QUERIES & MUTATIONS ============
   const {
@@ -25,6 +53,10 @@ const Dashboard = () => {
   } = useQuery({
     queryKey: ["all-posts"],
     queryFn: postsApi.getAllPosts,
+    onError: (error) => {
+      console.error("Error fetching posts:", error);
+      toast.error(`Failed to load posts: ${error.message || "Unknown error"}`);
+    },
   });
 
   const createPostMutation = useMutation({
@@ -33,6 +65,11 @@ const Dashboard = () => {
       queryClient.invalidateQueries({ queryKey: ["all-posts"] });
       queryClient.invalidateQueries({ queryKey: ["published-posts"] });
       setShowPostForm(false);
+      toast.success("Post created successfully!");
+    },
+    onError: (error) => {
+      console.error("Error creating post:", error);
+      toast.error(error.message || "Failed to create post");
     },
   });
 
@@ -43,6 +80,11 @@ const Dashboard = () => {
       queryClient.invalidateQueries({ queryKey: ["published-posts"] });
       setShowPostForm(false);
       setEditingPost(null);
+      toast.success("Post updated successfully!");
+    },
+    onError: (error) => {
+      console.error("Error updating post:", error);
+      toast.error(error.message || "Failed to update post");
     },
   });
 
@@ -51,6 +93,11 @@ const Dashboard = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["all-posts"] });
       queryClient.invalidateQueries({ queryKey: ["published-posts"] });
+      toast.success("Post deleted successfully!");
+    },
+    onError: (error) => {
+      console.error("Error deleting post:", error);
+      toast.error(error.message || "Failed to delete post");
     },
   });
 
@@ -62,6 +109,12 @@ const Dashboard = () => {
   } = useQuery({
     queryKey: ["resources"],
     queryFn: resourcesApi.getAllResources,
+    onError: (error) => {
+      console.error("Error fetching resources:", error);
+      toast.error(
+        `Failed to load resources: ${error.message || "Unknown error"}`
+      );
+    },
   });
 
   const createResourceMutation = useMutation({
@@ -69,10 +122,11 @@ const Dashboard = () => {
     onSuccess: () => {
       queryClient.invalidateQueries(["resources"]);
       setShowResourceForm(false);
-      alert("Resource uploaded successfully!");
+      toast.success("Resource uploaded successfully!");
     },
     onError: (error) => {
-      alert(error.message || "Failed to upload resource");
+      console.error("Error creating resource:", error);
+      toast.error(error.message || "Failed to upload resource");
     },
   });
 
@@ -82,10 +136,11 @@ const Dashboard = () => {
       queryClient.invalidateQueries(["resources"]);
       setShowResourceForm(false);
       setEditingResource(null);
-      alert("Resource updated successfully!");
+      toast.success("Resource updated successfully!");
     },
     onError: (error) => {
-      alert(error.message || "Failed to update resource");
+      console.error("Error updating resource:", error);
+      toast.error(error.message || "Failed to update resource");
     },
   });
 
@@ -93,10 +148,11 @@ const Dashboard = () => {
     mutationFn: resourcesApi.deleteResource,
     onSuccess: () => {
       queryClient.invalidateQueries(["resources"]);
-      alert("Resource deleted successfully!");
+      toast.success("Resource deleted successfully!");
     },
     onError: (error) => {
-      alert(error.message || "Failed to delete resource");
+      console.error("Error deleting resource:", error);
+      toast.error(error.message || "Failed to delete resource");
     },
   });
 
@@ -163,6 +219,112 @@ const Dashboard = () => {
     // Invalidate queries to refresh the data
     queryClient.invalidateQueries(["resources"]);
   };
+
+  // ============ HANDLE TAB SWITCH ============
+  useEffect(() => {
+    // Clear tags when switching to resources tab (resources don't have tags)
+    if (activeTab === "resources") {
+      setSelectedTags([]);
+    }
+  }, [activeTab]);
+
+  // ============ CLOSE DROPDOWN ON OUTSIDE CLICK ============
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      const dropdown = document.getElementById("tags-dropdown");
+      const button = event.target.closest("button");
+
+      if (dropdown && !dropdown.classList.contains("hidden")) {
+        // Check if click is outside both dropdown and its toggle button
+        if (
+          !dropdown.contains(event.target) &&
+          (!button || !button.contains(event.target.closest("svg")))
+        ) {
+          dropdown.classList.add("hidden");
+        }
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  // ============ FILTER AND SORT POSTS ============
+  const filteredPosts = posts
+    ?.filter((post) => {
+      // Search filter
+      if (searchQuery) {
+        const searchLower = searchQuery.toLowerCase();
+        const matchesSearch =
+          post.title?.toLowerCase().includes(searchLower) ||
+          post.excerpt?.toLowerCase().includes(searchLower) ||
+          post.content?.toLowerCase().includes(searchLower);
+        if (!matchesSearch) return false;
+      }
+
+      // Category filter
+      if (selectedCategory && post.category_id !== selectedCategory) {
+        return false;
+      }
+
+      // Tags filter
+      if (selectedTags.length > 0) {
+        if (!post.post_tags || post.post_tags.length === 0) return false;
+        const postTagIds = post.post_tags.map((pt) => pt.tags.id);
+        const hasMatchingTag = selectedTags.some((tagId) =>
+          postTagIds.includes(tagId)
+        );
+        if (!hasMatchingTag) return false;
+      }
+
+      return true;
+    })
+    .sort((a, b) => {
+      // Sort by date
+      if (sortBy === "newest") {
+        return (
+          new Date(b.created_at || b.published_at) -
+          new Date(a.created_at || a.published_at)
+        );
+      } else if (sortBy === "oldest") {
+        return (
+          new Date(a.created_at || a.published_at) -
+          new Date(b.created_at || b.published_at)
+        );
+      }
+      return 0;
+    });
+
+  // ============ FILTER AND SORT RESOURCES ============
+  const filteredResources = resources
+    ?.filter((resource) => {
+      // Search filter
+      if (searchQuery) {
+        const searchLower = searchQuery.toLowerCase();
+        const matchesSearch =
+          resource.title?.toLowerCase().includes(searchLower) ||
+          resource.description?.toLowerCase().includes(searchLower);
+        if (!matchesSearch) return false;
+      }
+
+      // Category filter
+      if (selectedCategory && resource.category_id !== selectedCategory) {
+        return false;
+      }
+
+      return true;
+    })
+    .sort((a, b) => {
+      // Sort by date
+      if (sortBy === "newest") {
+        return new Date(b.created_at) - new Date(a.created_at);
+      } else if (sortBy === "oldest") {
+        return new Date(a.created_at) - new Date(b.created_at);
+      }
+      return 0;
+    });
 
   // ============ RENDER POST FORM ============
   if (showPostForm) {
@@ -282,6 +444,222 @@ const Dashboard = () => {
               </button>
             </div>
 
+            {/* Search and Filters */}
+            <div className="mb-6 space-y-4">
+              {/* Search Bar */}
+              <div className="relative max-w-md">
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder={`Search ${
+                    activeTab === "posts" ? "posts" : "resources"
+                  }...`}
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-navy-500 focus:border-navy-500 transition-all shadow-sm text-sm"
+                />
+                <svg
+                  className="w-5 h-5 text-gray-400 absolute left-3 top-3.5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
+                </svg>
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery("")}
+                    className="absolute right-3 top-3.5 text-gray-400 hover:text-gray-600 transition-colors"
+                  >
+                    <svg
+                      className="w-5 h-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
+                    </svg>
+                  </button>
+                )}
+              </div>
+
+              {/* Filters Row */}
+              <div className="flex flex-wrap gap-3 items-center">
+                {/* Category Filter */}
+                <div className="relative">
+                  <select
+                    value={selectedCategory}
+                    onChange={(e) => setSelectedCategory(e.target.value)}
+                    className="appearance-none bg-white border border-gray-300 rounded-lg px-4 py-2.5 pr-10 text-sm text-gray-700 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-navy-500 focus:border-navy-500 cursor-pointer transition-all shadow-sm"
+                  >
+                    <option value="">All Categories</option>
+                    {categories?.map((category) => (
+                      <option
+                        key={category.id}
+                        value={category.id}
+                      >
+                        {category.name}
+                      </option>
+                    ))}
+                  </select>
+                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </svg>
+                  </div>
+                </div>
+
+                {/* Tags Filter - Only for Posts */}
+                {activeTab === "posts" && tags && tags.length > 0 && (
+                  <div className="relative">
+                    <button
+                      onClick={() => {
+                        const tagContainer =
+                          document.getElementById("tags-dropdown");
+                        tagContainer.classList.toggle("hidden");
+                      }}
+                      className="inline-flex items-center bg-white border border-gray-300 rounded-lg px-4 py-2.5 text-sm text-gray-700 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-navy-500 transition-all shadow-sm"
+                    >
+                      <svg
+                        className="w-4 h-4 mr-2"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
+                        />
+                      </svg>
+                      Tags
+                      {selectedTags.length > 0 && (
+                        <span className="ml-2 px-2 py-0.5 bg-navy-600 text-white text-xs rounded-full">
+                          {selectedTags.length}
+                        </span>
+                      )}
+                      <svg
+                        className="w-4 h-4 ml-2"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M19 9l-7 7-7-7"
+                        />
+                      </svg>
+                    </button>
+                    <div
+                      id="tags-dropdown"
+                      className="hidden absolute top-full left-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg p-3 z-10 min-w-[200px] max-h-[300px] overflow-y-auto"
+                    >
+                      {tags.map((tag) => (
+                        <label
+                          key={tag.id}
+                          className="flex items-center px-3 py-2 hover:bg-gray-50 rounded cursor-pointer"
+                        >
+                          <input
+                            type="checkbox"
+                            checked={selectedTags.includes(tag.id)}
+                            onChange={() => {
+                              setSelectedTags((prev) =>
+                                prev.includes(tag.id)
+                                  ? prev.filter((id) => id !== tag.id)
+                                  : [...prev, tag.id]
+                              );
+                            }}
+                            className="w-4 h-4 text-navy-600 border-gray-300 rounded focus:ring-navy-500"
+                          />
+                          <span className="ml-3 text-sm text-gray-700">
+                            {tag.name}
+                          </span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Sort Filter */}
+                <div className="relative">
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
+                    className="appearance-none bg-white border border-gray-300 rounded-lg px-4 py-2.5 pr-10 text-sm text-gray-700 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-navy-500 focus:border-navy-500 cursor-pointer transition-all shadow-sm"
+                  >
+                    <option value="newest">Newest First</option>
+                    <option value="oldest">Oldest First</option>
+                  </select>
+                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </svg>
+                  </div>
+                </div>
+
+                {/* Clear Filters Button */}
+                {(searchQuery ||
+                  selectedCategory ||
+                  selectedTags.length > 0) && (
+                  <button
+                    onClick={() => {
+                      setSearchQuery("");
+                      setSelectedCategory("");
+                      setSelectedTags([]);
+                    }}
+                    className="inline-flex items-center px-4 py-2.5 text-sm text-gray-600 hover:text-gray-900 transition-colors"
+                  >
+                    <svg
+                      className="w-4 h-4 mr-1.5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
+                    </svg>
+                    Clear Filters
+                  </button>
+                )}
+              </div>
+            </div>
+
             {/* ============ BLOG POSTS TAB ============ */}
             {activeTab === "posts" && (
               <div>
@@ -376,6 +754,16 @@ const Dashboard = () => {
                   </div>
                 )}
 
+                {/* Search Results Info */}
+                {searchQuery && filteredPosts && (
+                  <div className="mb-4">
+                    <p className="text-sm text-gray-600">
+                      Showing {filteredPosts.length} of {posts?.length || 0}{" "}
+                      posts
+                    </p>
+                  </div>
+                )}
+
                 {/* Action Buttons */}
                 <div className="flex flex-wrap gap-3 mb-6">
                   <button
@@ -452,15 +840,17 @@ const Dashboard = () => {
                 )}
 
                 {/* Posts List */}
-                {posts && posts.length > 0 && (
+                {filteredPosts && filteredPosts.length > 0 && (
                   <div>
                     <div className="flex items-center justify-between mb-6">
                       <h2 className="text-2xl font-bold text-gray-900">
-                        Your Posts ({posts.length})
+                        {searchQuery
+                          ? `Search Results (${filteredPosts.length})`
+                          : `Your Posts (${filteredPosts.length})`}
                       </h2>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                      {posts.map((post) => (
+                      {filteredPosts.map((post) => (
                         <PostCard
                           key={post.id}
                           post={post}
@@ -468,11 +858,101 @@ const Dashboard = () => {
                           onEdit={handleEditPost}
                           onDelete={handleDeletePost}
                           onPublishToggle={handlePostPublishToggle}
+                          currentUserId={user?.id}
                         />
                       ))}
                     </div>
                   </div>
                 )}
+
+                {/* No Results from Filters */}
+                {(searchQuery || selectedCategory || selectedTags.length > 0) &&
+                  filteredPosts &&
+                  filteredPosts.length === 0 &&
+                  posts &&
+                  posts.length > 0 && (
+                    <div className="text-center py-16">
+                      <div className="max-w-md mx-auto bg-white rounded-lg p-8 border border-gray-200">
+                        <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                          <svg
+                            className="w-10 h-10 text-gray-400"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                            />
+                          </svg>
+                        </div>
+                        <h3 className="text-2xl font-bold text-gray-900 mb-3">
+                          No posts found
+                        </h3>
+                        <p className="text-gray-600 mb-6">
+                          {searchQuery &&
+                          selectedCategory &&
+                          selectedTags.length > 0 ? (
+                            <>
+                              No posts match your search "{searchQuery}" with
+                              the selected category and tags.
+                            </>
+                          ) : searchQuery && selectedCategory ? (
+                            <>
+                              No posts match your search "{searchQuery}" in the
+                              selected category.
+                            </>
+                          ) : searchQuery && selectedTags.length > 0 ? (
+                            <>
+                              No posts match your search "{searchQuery}" with
+                              the selected tags.
+                            </>
+                          ) : selectedCategory && selectedTags.length > 0 ? (
+                            <>
+                              No posts found in the selected category with the
+                              selected tags.
+                            </>
+                          ) : searchQuery ? (
+                            <>No posts match your search "{searchQuery}".</>
+                          ) : selectedCategory ? (
+                            <>No posts found in the selected category.</>
+                          ) : selectedTags.length > 0 ? (
+                            <>
+                              No posts found with the selected tag
+                              {selectedTags.length > 1 ? "s" : ""}.
+                            </>
+                          ) : (
+                            <>Try adjusting your filters to find more posts.</>
+                          )}
+                        </p>
+                        <button
+                          onClick={() => {
+                            setSearchQuery("");
+                            setSelectedCategory("");
+                            setSelectedTags([]);
+                          }}
+                          className="inline-flex items-center px-6 py-3 bg-navy-800 text-white rounded-lg hover:bg-navy-900 transition-colors font-semibold"
+                        >
+                          <svg
+                            className="w-5 h-5 mr-2"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                            />
+                          </svg>
+                          Clear All Filters
+                        </button>
+                      </div>
+                    </div>
+                  )}
 
                 {/* Empty State */}
                 {posts && posts.length === 0 && (
@@ -584,16 +1064,21 @@ const Dashboard = () => {
                     <p className="font-bold">Error loading resources</p>
                     <p className="text-sm mt-1">{resourcesError.message}</p>
                   </div>
-                ) : resources && resources.length > 0 ? (
+                ) : filteredResources && filteredResources.length > 0 ? (
                   <>
                     <div className="mb-4">
                       <p className="text-gray-600 font-semibold">
-                        {resources.length} resource
-                        {resources.length !== 1 ? "s" : ""} total
+                        {searchQuery
+                          ? `Showing ${filteredResources.length} of ${
+                              resources?.length || 0
+                            } resources`
+                          : `${filteredResources.length} resource${
+                              filteredResources.length !== 1 ? "s" : ""
+                            } total`}
                       </p>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                      {resources.map((resource) => (
+                      {filteredResources.map((resource) => (
                         <ResourceCard
                           key={resource.id}
                           resource={resource}
@@ -601,10 +1086,76 @@ const Dashboard = () => {
                           onDelete={handleDeleteResource}
                           isAdmin={true}
                           onPublishToggle={handleResourcePublishToggle}
+                          currentUserId={user?.id}
                         />
                       ))}
                     </div>
                   </>
+                ) : (searchQuery || selectedCategory) &&
+                  filteredResources &&
+                  filteredResources.length === 0 &&
+                  resources &&
+                  resources.length > 0 ? (
+                  <div className="text-center py-16">
+                    <div className="max-w-md mx-auto bg-white rounded-lg p-8 border border-gray-200">
+                      <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <svg
+                          className="w-10 h-10 text-gray-400"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                          />
+                        </svg>
+                      </div>
+                      <h3 className="text-2xl font-bold text-gray-900 mb-3">
+                        No resources found
+                      </h3>
+                      <p className="text-gray-600 mb-6">
+                        {searchQuery && selectedCategory ? (
+                          <>
+                            No resources match your search "{searchQuery}" in
+                            the selected category.
+                          </>
+                        ) : searchQuery ? (
+                          <>No resources match your search "{searchQuery}".</>
+                        ) : selectedCategory ? (
+                          <>No resources found in the selected category.</>
+                        ) : (
+                          <>
+                            Try adjusting your filters to find more resources.
+                          </>
+                        )}
+                      </p>
+                      <button
+                        onClick={() => {
+                          setSearchQuery("");
+                          setSelectedCategory("");
+                        }}
+                        className="inline-flex items-center px-6 py-3 bg-navy-800 text-white rounded-lg hover:bg-navy-900 transition-colors font-semibold"
+                      >
+                        <svg
+                          className="w-5 h-5 mr-2"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                          />
+                        </svg>
+                        Clear All Filters
+                      </button>
+                    </div>
+                  </div>
                 ) : (
                   <div className="text-center py-16">
                     <div className="max-w-md mx-auto bg-white rounded-lg p-8 border border-gray-200">

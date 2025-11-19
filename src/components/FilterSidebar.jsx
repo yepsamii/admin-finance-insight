@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import toast from "react-hot-toast";
 import { categoriesApi, tagsApi } from "../services/blogApi";
 
 const FilterSidebar = ({
@@ -12,11 +13,21 @@ const FilterSidebar = ({
   const { data: categories, isLoading: categoriesLoading } = useQuery({
     queryKey: ["categories"],
     queryFn: categoriesApi.getAll,
+    onError: (error) => {
+      console.error("Error fetching categories:", error);
+      toast.error(
+        `Failed to load categories: ${error.message || "Unknown error"}`
+      );
+    },
   });
 
   const { data: tags, isLoading: tagsLoading } = useQuery({
     queryKey: ["tags"],
     queryFn: tagsApi.getAll,
+    onError: (error) => {
+      console.error("Error fetching tags:", error);
+      toast.error(`Failed to load tags: ${error.message || "Unknown error"}`);
+    },
   });
 
   return (

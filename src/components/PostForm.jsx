@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import toast from "react-hot-toast";
 import { categoriesApi, tagsApi, storageApi } from "../services/blogApi";
 import { ALLOWED_IMAGE_TYPES, MAX_IMAGE_SIZE } from "../constants/fileTypes";
 import { useCreateBlockNote } from "@blocknote/react";
@@ -41,9 +42,11 @@ const PostForm = ({ post = null, onSubmit, onCancel, isLoading = false }) => {
       try {
         // Upload file to Supabase storage
         const url = await storageApi.uploadContentFile(file);
+        toast.success("File uploaded successfully!");
         return url;
       } catch (error) {
         console.error("Error uploading file in BlockNote:", error);
+        toast.error(error.message || "Failed to upload file");
         throw error;
       }
     },
@@ -60,6 +63,7 @@ const PostForm = ({ post = null, onSubmit, onCancel, isLoading = false }) => {
         setTags(tagsData);
       } catch (error) {
         console.error("Error loading data:", error);
+        toast.error("Failed to load categories and tags");
       } finally {
         setLoading(false);
       }
@@ -189,12 +193,15 @@ const PostForm = ({ post = null, onSubmit, onCancel, isLoading = false }) => {
         header_image_url: imageUrl,
       }));
 
+      toast.success("Header image uploaded successfully!");
+
       // Reset progress after a short delay
       setTimeout(() => {
         setUploadProgress(0);
       }, 1000);
     } catch (error) {
       console.error("Error uploading image:", error);
+      toast.error(error.message || "Failed to upload header image");
       setErrors((prev) => ({
         ...prev,
         header_image_url: error.message || "Failed to upload image",

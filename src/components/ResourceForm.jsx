@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import toast from "react-hot-toast";
 import { categoriesApi, tagsApi } from "../services/blogApi";
 import { resourceStorageApi, formatFileSize } from "../services/resourcesApi";
 
@@ -49,7 +50,9 @@ const ResourceForm = ({ resource, onSubmit, onCancel }) => {
         }
       } catch (err) {
         console.error("Error loading data:", err);
-        setError("Failed to load categories and tags");
+        const errorMsg = "Failed to load categories and tags";
+        setError(errorMsg);
+        toast.error(errorMsg);
       } finally {
         setLoading(false);
       }
@@ -110,13 +113,17 @@ const ResourceForm = ({ resource, onSubmit, onCancel }) => {
         file_size: fileData.fileSize,
       }));
 
+      toast.success("File uploaded successfully!");
+
       // Reset progress after a short delay
       setTimeout(() => {
         setUploadProgress(0);
       }, 1000);
     } catch (err) {
       console.error("Error uploading file:", err);
-      setError(err.message || "Failed to upload file");
+      const errorMsg = err.message || "Failed to upload file";
+      setError(errorMsg);
+      toast.error(errorMsg);
       setUploadProgress(0);
     } finally {
       setUploadingFile(false);

@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
 import { useQuery } from "@tanstack/react-query";
+import toast from "react-hot-toast";
 import { resourcesApi } from "../services/resourcesApi";
 import { categoriesApi } from "../services/blogApi";
 import ResourceCard from "../components/ResourceCard";
@@ -17,13 +18,34 @@ const Resources = () => {
   } = useQuery({
     queryKey: ["resources"],
     queryFn: resourcesApi.getPublishedResources,
+    onError: (error) => {
+      console.error("Error fetching resources:", error);
+      toast.error(
+        `Failed to load resources: ${error.message || "Unknown error"}`
+      );
+    },
   });
 
   // Fetch categories
   const { data: categories } = useQuery({
     queryKey: ["categories"],
     queryFn: categoriesApi.getAll,
+    onError: (error) => {
+      console.error("Error fetching categories:", error);
+      toast.error(
+        `Failed to load categories: ${error.message || "Unknown error"}`
+      );
+    },
   });
+
+  // Show toast on error
+  useEffect(() => {
+    if (resourcesError) {
+      toast.error(
+        `Error loading resources: ${resourcesError.message || "Unknown error"}`
+      );
+    }
+  }, [resourcesError]);
 
   // Filter resources
   const filteredResources = resources?.filter((resource) => {

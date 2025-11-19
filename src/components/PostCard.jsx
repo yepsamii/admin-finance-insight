@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { useState } from "react";
+import toast from "react-hot-toast";
 import { formatDate } from "../utils/dateFormatter";
 import { truncateText } from "../utils/textHelpers";
 import { postsApi } from "../services/blogApi";
@@ -10,11 +11,15 @@ const PostCard = ({
   onEdit,
   onDelete,
   onPublishToggle,
+  currentUserId,
 }) => {
   const [isTogglingPublish, setIsTogglingPublish] = useState(false);
   const [currentPublishedState, setCurrentPublishedState] = useState(
     post.published
   );
+
+  // Check if current user is the author
+  const isAuthor = currentUserId && post.author_id === currentUserId;
 
   const handlePublishToggle = async (e) => {
     e.preventDefault();
@@ -27,13 +32,18 @@ const PostCard = ({
         published: !currentPublishedState,
       });
       setCurrentPublishedState(!currentPublishedState);
+      toast.success(
+        !currentPublishedState
+          ? "Post published successfully!"
+          : "Post unpublished successfully!"
+      );
       // Notify parent component if callback provided
       if (onPublishToggle) {
         onPublishToggle(post.id, !currentPublishedState);
       }
     } catch (error) {
       console.error("Error toggling publish status:", error);
-      alert("Failed to update publish status");
+      toast.error(error.message || "Failed to update publish status");
     } finally {
       setIsTogglingPublish(false);
     }
@@ -83,9 +93,9 @@ const PostCard = ({
           </div>
         )}
 
-        {/* Draft Badge */}
-        {!currentPublishedState && (
-          <div className="absolute top-3 right-3">
+        {/* Draft Badge and Author Badge */}
+        <div className="absolute top-3 right-3 flex flex-col gap-2 items-end">
+          {!currentPublishedState && (
             <span className="inline-flex items-center px-2.5 py-1 bg-yellow-100 text-yellow-800 text-xs font-semibold rounded border border-yellow-200">
               <svg
                 className="w-3 h-3 mr-1"
@@ -100,8 +110,24 @@ const PostCard = ({
               </svg>
               Draft
             </span>
-          </div>
-        )}
+          )}
+          {!isAuthor && currentUserId && (
+            <span className="inline-flex items-center px-2.5 py-1 bg-red-200 text-red-800 text-xs font-semibold rounded border border-red-300">
+              <svg
+                className="w-3 h-3 mr-1"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              Not Author
+            </span>
+          )}
+        </div>
       </Link>
 
       <div className="p-5">
@@ -141,14 +167,16 @@ const PostCard = ({
             <div className="flex items-center space-x-1">
               <button
                 onClick={handlePublishToggle}
-                disabled={isTogglingPublish}
+                disabled={isTogglingPublish || !isAuthor}
                 className={`p-2 rounded transition-colors ${
                   currentPublishedState
                     ? "text-green-600 hover:bg-green-50"
                     : "text-gray-600 hover:bg-gray-100"
                 } disabled:opacity-50 disabled:cursor-not-allowed`}
                 title={
-                  currentPublishedState
+                  !isAuthor
+                    ? "Only the author can publish/unpublish this post"
+                    : currentPublishedState
                     ? "Published - Click to unpublish"
                     : "Draft - Click to publish"
                 }
@@ -194,10 +222,19 @@ const PostCard = ({
               <button
                 onClick={(e) => {
                   e.preventDefault();
-                  onEdit(post);
+                  if (isAuthor) {
+                    onEdit(post);
+                  }
                 }}
-                className="p-2 text-navy-600 hover:bg-gray-100 rounded transition-colors"
-                title="Edit post"
+                disabled={!isAuthor}
+                className={`p-2 rounded transition-colors ${
+                  isAuthor
+                    ? "text-navy-600 hover:bg-gray-100"
+                    : "text-gray-400 cursor-not-allowed"
+                } disabled:opacity-50`}
+                title={
+                  !isAuthor ? "Only the author can edit this post" : "Edit post"
+                }
               >
                 <svg
                   className="w-4 h-4"
@@ -216,10 +253,21 @@ const PostCard = ({
               <button
                 onClick={(e) => {
                   e.preventDefault();
-                  onDelete(post);
+                  if (isAuthor) {
+                    onDelete(post);
+                  }
                 }}
-                className="p-2 text-red-600 hover:bg-red-50 rounded transition-colors"
-                title="Delete post"
+                disabled={!isAuthor}
+                className={`p-2 rounded transition-colors ${
+                  isAuthor
+                    ? "text-red-600 hover:bg-red-50"
+                    : "text-gray-400 cursor-not-allowed"
+                } disabled:opacity-50`}
+                title={
+                  !isAuthor
+                    ? "Only the author can delete this post"
+                    : "Delete post"
+                }
               >
                 <svg
                   className="w-4 h-4"
