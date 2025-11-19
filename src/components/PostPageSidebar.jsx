@@ -1,6 +1,15 @@
 import { Link } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { postsApi } from "../services/blogApi";
+import { formatDate } from "../utils/dateFormatter";
 
 const PostPageSidebar = ({post}) => {
+  // Fetch latest 3 posts
+  const { data: latestPosts, isLoading } = useQuery({
+    queryKey: ["latestPosts"],
+    queryFn: () => postsApi.getLatestPosts(3),
+  });
+
   return (
     <aside className="lg:w-80 flex-shrink-0 order-2 lg:order-1">
       <div className="lg:sticky lg:top-20 space-y-6">
@@ -27,6 +36,57 @@ const PostPageSidebar = ({post}) => {
               </div>
             ))}
           </div>
+        </div>
+
+        {/* Latest Created Posts */}
+        <div className="bg-white rounded-lg border border-gray-200 p-6">
+          <h3 className="text-lg font-bold text-gray-900 mb-4">Latest Posts</h3>
+          {isLoading ? (
+            <div className="flex justify-center py-4">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            </div>
+          ) : latestPosts && latestPosts.length > 0 ? (
+            <div className="space-y-4">
+              {latestPosts.map((latestPost) => (
+                <div
+                  key={latestPost.id}
+                  className="flex items-start space-x-3"
+                >
+                  {latestPost.header_image_url ? (
+                    <img
+                      src={latestPost.header_image_url}
+                      alt={latestPost.title}
+                      className="w-16 h-16 bg-gray-200 rounded flex-shrink-0 object-cover"
+                      onError={(e) => {
+                        e.target.src = '';
+                        e.target.className = 'w-16 h-16 bg-gray-200 rounded flex-shrink-0';
+                      }}
+                    />
+                  ) : (
+                    <div className="w-16 h-16 bg-gray-200 rounded flex-shrink-0"></div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <Link
+                      to={`/post/${latestPost.slug}`}
+                      className="text-sm font-semibold text-gray-900 hover:text-blue-600 line-clamp-2 mb-1"
+                    >
+                      {latestPost.title}
+                    </Link>
+                    <p className="text-xs text-gray-500">
+                      {formatDate(latestPost.created_at)}
+                    </p>
+                    {latestPost.categories?.name && (
+                      <p className="text-xs text-gray-400 mt-1">
+                        {latestPost.categories.name}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm text-gray-500">No posts available</p>
+          )}
         </div>
 
         {/* Categories */}

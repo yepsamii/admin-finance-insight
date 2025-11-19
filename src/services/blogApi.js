@@ -187,6 +187,35 @@ export const postsApi = {
     return data;
   },
 
+  // Get latest N posts (ordered by creation date)
+  async getLatestPosts(limit = 3) {
+    const { data, error } = await supabase
+      .from("posts")
+      .select(
+        `
+        *,
+        categories (
+          id,
+          name,
+          slug
+        ),
+        post_tags (
+          tags (
+            id,
+            name,
+            slug
+          )
+        )
+      `
+      )
+      .eq("published", true)
+      .order("created_at", { ascending: false })
+      .limit(limit);
+
+    if (error) throw error;
+    return data;
+  },
+
   // Get all posts for admin (including drafts)
   async getAllPosts() {
     const { data, error } = await supabase
