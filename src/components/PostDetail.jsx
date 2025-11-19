@@ -1,14 +1,16 @@
 import { Link } from "react-router-dom";
-import { formatDate, calculateReadingTime } from "../utils/dateFormatter";
+import { formatDate } from "../utils/dateFormatter";
 import { useCreateBlockNote } from "@blocknote/react";
 import { BlockNoteView } from "@blocknote/mantine";
 import { useEffect } from "react";
 import "@blocknote/core/fonts/inter.css";
 import "@blocknote/mantine/style.css";
+import PostPageSidebar from "./PostPageSidebar";
 
 const PostDetail = ({ post }) => {
   // Initialize BlockNote editor in read-only mode
   const editor = useCreateBlockNote({ editable: false });
+  console.log(post);
 
   useEffect(() => {
     if (post && post.content) {
@@ -82,131 +84,19 @@ const PostDetail = ({ post }) => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Sidebar - Left */}
-          <aside className="lg:w-80 flex-shrink-0 order-2 lg:order-1">
-            <div className="lg:sticky lg:top-20 space-y-6">
-              {/* Recent Posts */}
-              <div className="bg-white rounded-lg border border-gray-200 p-6">
-                <h3 className="text-lg font-bold text-gray-900 mb-4">
-                  Recent Posts
-                </h3>
-                <div className="space-y-4">
-                  {/* Mock recent posts - you'd fetch these from API */}
-                  {[1, 2, 3].map((i) => (
-                    <div
-                      key={i}
-                      className="flex items-start space-x-3"
-                    >
-                      <div className="w-16 h-16 bg-gray-200 rounded flex-shrink-0"></div>
-                      <div className="flex-1 min-w-0">
-                        <Link
-                          to="/"
-                          className="text-sm font-semibold text-gray-900 hover:text-blue-600 line-clamp-2 mb-1"
-                        >
-                          The Future of Cryptocurrency in Traditional Banking
-                        </Link>
-                        <p className="text-xs text-gray-500">July 16, 2025</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Categories */}
-              {post.categories && (
-                <div className="bg-white rounded-lg border border-gray-200 p-6">
-                  <h3 className="text-lg font-bold text-gray-900 mb-4">
-                    Categories
-                  </h3>
-                  <div className="space-y-2">
-                    <Link
-                      to="/"
-                      className="flex items-center text-sm text-gray-700 hover:text-blue-600"
-                    >
-                      <span className="flex-1">Finance</span>
-                      <span className="text-gray-400">8</span>
-                    </Link>
-                    <Link
-                      to="/"
-                      className="flex items-center text-sm text-gray-700 hover:text-blue-600"
-                    >
-                      <span className="flex-1">Tax</span>
-                      <span className="text-gray-400">4</span>
-                    </Link>
-                    <Link
-                      to="/"
-                      className="flex items-center text-sm text-gray-700 hover:text-blue-600"
-                    >
-                      <span className="flex-1">Economics</span>
-                      <span className="text-gray-400">5</span>
-                    </Link>
-                    <Link
-                      to="/"
-                      className="flex items-center text-sm text-gray-700 hover:text-blue-600"
-                    >
-                      <span className="flex-1">Auditing</span>
-                      <span className="text-gray-400">2</span>
-                    </Link>
-                    <Link
-                      to="/"
-                      className="flex items-center text-sm text-gray-700 hover:text-blue-600"
-                    >
-                      <span className="flex-1">Accounting</span>
-                      <span className="text-gray-400">4</span>
-                    </Link>
-                    <Link
-                      to="/"
-                      className="flex items-center text-sm text-gray-700 hover:text-blue-600"
-                    >
-                      <span className="flex-1">Industry Analysis</span>
-                      <span className="text-gray-400">3</span>
-                    </Link>
-                  </div>
-                </div>
-              )}
-
-              {/* Popular Tags */}
-              {post.post_tags && post.post_tags.length > 0 && (
-                <div className="bg-white rounded-lg border border-gray-200 p-6">
-                  <h3 className="text-lg font-bold text-gray-900 mb-4">
-                    Popular Tags
-                  </h3>
-                  <div className="flex flex-wrap gap-2">
-                    {[
-                      "Tax Planning",
-                      "Audit",
-                      "Compliance",
-                      "Money",
-                      "Investing",
-                      "Stocks",
-                      "Market Trends",
-                      "Inflation",
-                      "Bonds",
-                    ].map((tag) => (
-                      <Link
-                        key={tag}
-                        to="/"
-                        className="px-3 py-1 bg-gray-100 text-gray-700 text-xs rounded hover:bg-gray-200 transition-colors"
-                      >
-                        {tag}
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          </aside>
+          <PostPageSidebar post={post} />
 
           {/* Main Content */}
-          <article className="flex-1 order-1 lg:order-2 bg-white rounded-lg border border-gray-200 p-8">
+          <article className="w-full order-1 lg:order-2 bg-white rounded-lg border border-gray-200 p-8">
             {/* Header Image */}
             {post.header_image_url && (
-              <div className="relative aspect-video w-full mb-8 overflow-hidden rounded">
+              <figure className="w-full relative aspect-video mb-8 rounded">
                 <img
                   src={post.header_image_url}
                   alt={post.title}
-                  className="w-full h-full object-cover"
+                  className="w-full object-cover"
                 />
-              </div>
+              </figure>
             )}
 
             {/* Category & Meta Bar */}
@@ -230,22 +120,26 @@ const PostDetail = ({ post }) => {
               </p>
             )}
 
-            {/* Meta Information */}
+            {/* Tags Information */}
             <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500 mb-8 pb-6 border-b border-gray-200">
-              <div className="flex items-center">
-                <svg
-                  className="w-4 h-4 mr-1.5"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-                <span>Tax</span>
-              </div>
+              {post.post_tags && post.post_tags.length > 0 && (
+                <div className="flex items-center">
+                  <svg
+                    className="w-4 h-4 mr-1.5"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                  <span>
+                    {post.post_tags.map((tag) => tag.tags.name).join(", ")}
+                  </span>
+                </div>
+              )}
 
               <div className="flex items-center">
                 <svg
@@ -272,13 +166,13 @@ const PostDetail = ({ post }) => {
             </div>
 
             {/* Content */}
-            <div className="blog-content prose prose-lg max-w-none mb-12">
+            {/* <div className="blog-content prose prose-lg max-w-none mb-12">
               <BlockNoteView
                 editor={editor}
                 theme="light"
                 editable={false}
               />
-            </div>
+            </div> */}
 
             {/* Share This Article */}
             <div className="mt-12 pt-6 border-t border-gray-200">

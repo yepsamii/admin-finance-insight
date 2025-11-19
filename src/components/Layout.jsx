@@ -407,25 +407,6 @@ const Layout = ({ children }) => {
                 </Link>
               </div>
             </div>
-
-            {/* Stay Updated */}
-            <div>
-              <h3 className="font-bold mb-4 text-white">Stay Updated</h3>
-              <p className="text-gray-400 text-sm mb-4">
-                Get the latest finance and accounting insights delivered to your
-                inbox.
-              </p>
-              <div className="flex">
-                <input
-                  type="email"
-                  placeholder="Enter Your Email"
-                  className="flex-1 px-4 py-2 bg-navy-900 border border-navy-800 rounded-l focus:outline-none focus:border-white/30 text-white placeholder-gray-500 text-sm"
-                />
-                <button className="px-6 py-2 bg-white text-navy-950 rounded-r font-semibold hover:bg-gray-100 transition-colors text-sm">
-                  Subscribe
-                </button>
-              </div>
-            </div>
           </div>
 
           <div className="mt-8 pt-8 border-t border-navy-900 text-center text-gray-400 text-sm">
