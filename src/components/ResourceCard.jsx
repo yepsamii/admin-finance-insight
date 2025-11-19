@@ -8,12 +8,16 @@ const ResourceCard = ({
   onDelete,
   isAdmin = false,
   onPublishToggle,
+  currentUserId,
 }) => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [isTogglingPublish, setIsTogglingPublish] = useState(false);
   const [currentPublishedState, setCurrentPublishedState] = useState(
     resource.published
   );
+
+  // Check if current user is the uploader/author
+  const isAuthor = currentUserId && resource.uploaded_by === currentUserId;
 
   const handleDelete = async () => {
     if (window.confirm("Are you sure you want to delete this resource?")) {
@@ -64,9 +68,9 @@ const ResourceCard = ({
 
   return (
     <div className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden border border-gray-200 relative">
-      {/* Draft Badge */}
-      {!currentPublishedState && (
-        <div className="absolute top-3 right-3 z-10">
+      {/* Draft Badge and Author Badge */}
+      <div className="absolute top-3 right-3 z-10 flex flex-col gap-2 items-end">
+        {!currentPublishedState && (
           <span className="inline-flex items-center px-2.5 py-1 bg-yellow-100 text-yellow-800 text-xs font-semibold rounded border border-yellow-200">
             <svg
               className="w-3 h-3 mr-1"
@@ -81,8 +85,24 @@ const ResourceCard = ({
             </svg>
             Draft
           </span>
-        </div>
-      )}
+        )}
+        {!isAuthor && currentUserId && (
+          <span className="inline-flex items-center px-2.5 py-1 bg-red-200 text-red-800 text-xs font-semibold rounded border border-red-300">
+            <svg
+              className="w-3 h-3 mr-1"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path
+                fillRule="evenodd"
+                d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+                clipRule="evenodd"
+              />
+            </svg>
+            Not Author
+          </span>
+        )}
+      </div>
 
       {/* Card Content */}
       <div className="p-5">
@@ -127,14 +147,16 @@ const ResourceCard = ({
           {isAdmin && (
             <button
               onClick={handlePublishToggle}
-              disabled={isTogglingPublish}
+              disabled={isTogglingPublish || !isAuthor}
               className={`p-2 rounded transition-colors ${
                 currentPublishedState
                   ? "text-green-600 hover:bg-green-50"
                   : "text-gray-600 hover:bg-gray-100"
               } disabled:opacity-50 disabled:cursor-not-allowed`}
               title={
-                currentPublishedState
+                !isAuthor
+                  ? "Only the author can publish/unpublish this resource"
+                  : currentPublishedState
                   ? "Published - Click to unpublish"
                   : "Draft - Click to publish"
               }
@@ -181,8 +203,22 @@ const ResourceCard = ({
 
           {isAdmin && onEdit && (
             <button
-              onClick={() => onEdit(resource)}
-              className="px-3 py-2 bg-navy-100 text-navy-700 rounded hover:bg-navy-200 transition-colors font-medium text-sm"
+              onClick={() => {
+                if (isAuthor) {
+                  onEdit(resource);
+                }
+              }}
+              disabled={!isAuthor}
+              className={`px-3 py-2 rounded transition-colors font-medium text-sm ${
+                isAuthor
+                  ? "bg-navy-100 text-navy-700 hover:bg-navy-200"
+                  : "bg-gray-100 text-gray-400 cursor-not-allowed"
+              } disabled:opacity-50`}
+              title={
+                !isAuthor
+                  ? "Only the author can edit this resource"
+                  : "Edit resource"
+              }
             >
               Edit
             </button>
@@ -191,8 +227,17 @@ const ResourceCard = ({
           {isAdmin && onDelete && (
             <button
               onClick={handleDelete}
-              disabled={isDeleting}
-              className="px-3 py-2 bg-red-100 text-red-600 rounded hover:bg-red-200 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+              disabled={isDeleting || !isAuthor}
+              className={`px-3 py-2 rounded transition-colors font-medium text-sm ${
+                isAuthor
+                  ? "bg-red-100 text-red-600 hover:bg-red-200"
+                  : "bg-gray-100 text-gray-400 cursor-not-allowed"
+              } disabled:opacity-50 disabled:cursor-not-allowed`}
+              title={
+                !isAuthor
+                  ? "Only the author can delete this resource"
+                  : "Delete resource"
+              }
             >
               {isDeleting ? "..." : "Delete"}
             </button>

@@ -9,6 +9,7 @@ import PostForm from "../components/PostForm";
 import ResourceCard from "../components/ResourceCard";
 import ResourceForm from "../components/ResourceForm";
 import CategoryTagSidebar from "../components/CategoryTagSidebar";
+import { useAuth } from "../contexts/AuthContext";
 
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState("posts");
@@ -17,6 +18,7 @@ const Dashboard = () => {
   const [showResourceForm, setShowResourceForm] = useState(false);
   const [editingResource, setEditingResource] = useState(null);
   const queryClient = useQueryClient();
+  const { user } = useAuth();
 
   // ============ POSTS QUERIES & MUTATIONS ============
   const {
@@ -497,6 +499,7 @@ const Dashboard = () => {
                           onEdit={handleEditPost}
                           onDelete={handleDeletePost}
                           onPublishToggle={handlePostPublishToggle}
+                          currentUserId={user?.id}
                         />
                       ))}
                     </div>
@@ -630,6 +633,7 @@ const Dashboard = () => {
                           onDelete={handleDeleteResource}
                           isAdmin={true}
                           onPublishToggle={handleResourcePublishToggle}
+                          currentUserId={user?.id}
                         />
                       ))}
                     </div>
